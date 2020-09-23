@@ -119,6 +119,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "pedidos-front"
+    }
+  },
+  "defaultProject": "pedidos-front",
+  "cli": {
+    "analytics": false
+  }
 }
