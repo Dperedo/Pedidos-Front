@@ -1,0 +1,51 @@
+<app-navbar></app-navbar>
+
+<div class="row">
+    <div class="col-md-5 container">
+        <h1>Lista Productos</h1>
+    </div>
+</div>
+<tr></tr>
+<div class="row">
+    <div class="col-md-2 container">
+        <input>
+        <button class="btn btn-primary">Buscar</button>
+    </div>
+
+
+    <div class="col-md-2 container">
+        <button class="btn btn-primary">Agregar Productos</button>
+    </div>
+</div>
+<tr></tr>
+<tr></tr>
+<div class="row">
+    <div class="col-md-8 container">
+
+        <table class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>Valor</th>
+                    <th>Vigente</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody *ngIf="registro">
+                <tr *ngFor="let listados of listado">
+                    <td>{{listados.codigo}}</td>
+                    <td>{{listados.nombre}}</td>
+                    <td>{{listados.valor}}</td>
+                    <td>{{vigenteProducto(listados.vigente)}}</td>
+                    <td>
+                        <button class="btn btn-danger" *ngIf="listados.vigente">Desactivar</button>
+                        <button class="btn btn-primary" *ngIf="!listados.vigente">Activar</button>
+                    </td>
+                </tr>
+            </tbody>
+            <p *ngIf="!registro">No hay Productos!</p>
+        </table>
+
+    </div>
+</div>

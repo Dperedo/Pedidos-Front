@@ -1,0 +1,117 @@
+<app-navbar></app-navbar>
+<tr></tr>
+<tr></tr>
+<div *ngIf="!formulario">
+    <div class="row">
+        <div class="col-md-5 container">
+            <h1>Lista Clientes</h1>
+        </div>
+    </div>
+    <tr></tr>
+    <div class="row">
+        <div class="col-md-2 container">
+            <input [(ngModel)]="buscar" name="buscar" (keyup.enter)="getBuscar()" type="text" class="form-control" placeholder="Buscar un dato">
+            <button class="btn btn-primary" type="submit" (click)="getBuscar()">Buscar</button>
+        </div>
+
+
+        <div class="col-md-2 container">
+            <button class="btn btn-primary" (click)="agregarCliente()">Agregar Cliente</button>
+        </div>
+    </div>
+    <tr></tr>
+    <tr></tr>
+
+    <div class="row">
+        <div class="col-md-8 container">
+
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>RUT</th>
+                        <th>Nombre</th>
+                        <th>Fecha Creado</th>
+                        <th>Vigente</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody *ngIf="registro">
+                    <tr *ngFor="let listados of listado; let i = index">
+                        <td>
+                            <button class="btn btn-primary" (click)="editarCliente(listado[i])">{{ i + 1 }}</button>
+                        </td>
+                        <td>{{listados.rut}}</td>
+                        <td>{{listados.razonSocial}}</td>
+                        <td>{{listados.fechaDeCreacion | date:'dd/MM/yyyy' }}</td>
+                        <td>{{vigenteCliente(listados.vigente)}}</td>
+                        <td>
+                            <button class="btn btn-danger" *ngIf="listados.vigente" (click)="editarVigente(listado[i])">Desactivar</button>
+                            <button class="btn btn-primary" *ngIf="!listados.vigente" (click)="editarVigente(listado[i])">Activar</button>
+                        </td>
+                    </tr>
+                </tbody>
+                <p *ngIf="!registro">No hay Clientes!</p>
+            </table>
+
+        </div>
+    </div>
+    <div class="col-md-1 container">
+        <div class="row">
+            <button class="btn" (click)="getPage(pages[0])">{{pages[0]}}</button>
+            <tr>_</tr>
+            <button class="btn" (click)="getPage(pages[1])">{{pages[1]}}</button>
+            <tr>_</tr>
+            <button class="btn" (click)="getPage(pages[2])">{{pages[2]}}</button>
+        </div>
+    </div>
+</div>
+<th></th>
+
+<div *ngIf="formulario">
+    <div class="row">
+        <div class="col-md-5 container">
+            <h1>Cliente</h1>
+        </div>
+    </div>
+    <tr></tr>
+    <tr></tr>
+    <form autocomplete="off" [formGroup]="forma" (ngSubmit)="guardar()" class="container">
+        <div>
+            <div class="form-group row">
+                <label class="col-2 col-form-label">RazonSocial</label>
+                <div class="col-8">
+                    <input class="form-control" type="text" placeholder="razonSocial" formControlName="razonSocial" [class.is-invalid]="razonSocialNoValido">
+                    <small *ngIf="razonSocialNoValido" class="text-danger">Ingrese RazonSocial</small>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-2 col-form-label">RUT</label>
+                <div class="col-8">
+                    <input class="form-control" type="text" placeholder="rut" formControlName="rut" [class.is-invalid]="rutNoValido">
+                    <small *ngIf="rutNoValido" class="text-danger">Ingrese RUT</small>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-2 col-form-label">Vigente</label>
+                <div class="col-8">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="vigente" value="1" formControlName="vigente" [class.is-invalid]="vigenteNoValido">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-8">
+                    <button class="btn btn-primary" type="button" (click)="guardar()">Guardar</button>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <div class="col-8">
+                    <button class="btn btn-primary" type="button" (click)="volver()">Volver</button>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
