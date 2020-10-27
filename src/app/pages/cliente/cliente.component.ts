@@ -186,13 +186,13 @@ export class ClienteComponent implements OnInit {
       });
     } else
     {
-      console.log(this.forma.value); /*
+      console.log(this.forma.value);
       this.cliente.rut = this.forma.value.rut;
       this.cliente.razonSocial = this.forma.value.razonSocial;
-      this.cliente.vigente = this.forma.value.vigente;*/
-      this.cliente = {
+      this.cliente.vigente = this.forma.value.vigente;
+      /*this.cliente = {
         ...this.forma.value,
-      };
+      };*/
       console.log(this.cliente);
       if ( this.cliente.id ) {
         console.log('Modificando: ' + this.cliente.id);
