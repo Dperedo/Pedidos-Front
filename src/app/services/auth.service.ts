@@ -72,17 +72,8 @@ export class AuthService {
 
   // ----------------------------------------------------------------------------------------------------------
 
-  getDato33(controlador: string) {
-    this.userToken = this.leerToken();
 
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${ this.userToken }`
-    });
-    console.log('Dentro de getDato');
-    return this.http.get(`${ this.url }/${ controlador }`).pipe(map((res: any) => res ));
-  }
-
-  getDato(controlador: string, buscar: string, page: string) {
+  getDato(controlador: string, buscar: string, page: string, orden: string) {
     this.userToken = this.leerToken();
 
     if ( !page ) {
@@ -95,26 +86,23 @@ export class AuthService {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${ this.userToken }`
     });
-    console.log('page=' + page, 'buscar=' + buscar);
+    console.log('page=' + page, 'buscar=' + buscar, 'orden=' + orden);
     console.log('Dentro de getDatoBuscar');
 
-    return this.http.get(`${ this.url }/${ controlador }/query?texto=${ buscar }&page=${ page }`).pipe(map((res: any) => res ));
+    return this.http.get(`${ this.url }/${ controlador }/query?texto=${ buscar }&page=${ page }&order=${ orden }`).pipe(map((res: any) => res ));
   }
 
-  
-/*
+  getDatoId(controlador: string, ID: string) {
+    this.userToken = this.leerToken();
 
-take = cuantos registros por página
-page = la pagina que quiero ver
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${ this.userToken }`
+    });
+    console.log('ID=' + ID);
+    console.log('Dentro de getDatoId');
 
----
-backend:
-if take == null o invalido entonces take = 10
-if page es inválido entonces = 1
-
-skip = (page - 1) * take
-
-*/
+    return this.http.get(`${ this.url }/${ controlador }/${ ID }`).pipe(map((res: any) => res ));
+  }
 
   postDato(Datos: any, controlador: string){
     const Data = {
@@ -130,7 +118,7 @@ skip = (page - 1) * take
     return this.http.post(`${ this.url }/${ controlador }`, Data).pipe(map((res: any) => res));
   }
 
-  putDato(Datos: any, controlador: string){
+  putDato(controlador: string, Datos: any){
     const Data = {
       ...Datos,
     };
@@ -213,3 +201,19 @@ skip = (page - 1) * take
   }
 
 }
+
+
+
+/*
+
+take = cuantos registros por página
+page = la pagina que quiero ver
+
+---
+backend:
+if take == null o invalido entonces take = 10
+if page es inválido entonces = 1
+
+skip = (page - 1) * take
+
+*/

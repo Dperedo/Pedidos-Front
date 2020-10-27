@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ClienteModel } from '../../models/cliente.model';
 import { FormArray, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-cliente',
@@ -12,13 +13,19 @@ import { FormArray, FormBuilder, FormGroup, Validators, FormControl } from '@ang
 })
 export class ClienteComponent implements OnInit {
 
-  registro = true;
+  // registro = true;
   forma: FormGroup;
   listado: ClienteModel[] = [];
   formulario = false;
   buscar = '';
-  page = '';
-  pages = ['1', '2', '3'];
+  page = '1';
+  total = 0;
+  paginas = 1;
+  orden = '';
+  btnRut = false;
+  btnRazon = false;
+  btnFecha = true;
+  btnVicen = false;
   // tslint:disable-next-line: new-parens
   cliente: ClienteModel = new ClienteModel();
 
@@ -39,6 +46,26 @@ export class ClienteComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  pagAnterior() {
+    // tslint:disable-next-line: prefer-const
+    // tslint:disable-next-line: radix
+    const dato = parseInt(this.page) - 1;
+    this.page = dato.toString();
+    this.getPage(this.page);
+  }
+
+  pagSiguiente() {
+    // tslint:disable-next-line: prefer-const
+    // tslint:disable-next-line: radix
+    const dato = parseInt(this.page) + 1;
+    this.page = dato.toString();
+    this.getPage(this.page);
+  }
+
+  arreglo(n: number) {
+    return Array(n);
+  }
+
   leerParametros() {
     this.router.params.subscribe( parametros => {
       console.log('parametro = ', parametros);
@@ -55,10 +82,14 @@ export class ClienteComponent implements OnInit {
 
 
     console.log('listadoCliente');
-    this.auth.getDato('Clientes', this.buscar, this.page).subscribe(
+    this.auth.getDato('Clientes', this.buscar, this.page, this.orden).subscribe(
       resp => {
-        this.listado = resp;
+        this.listado = resp['list'];
+        this.total = resp['total'];
+        this.paginas = resp['numpages'];
         console.log(this.listado);
+        console.log(this.total);
+        console.log(this.paginas);
       }
     );
   }
@@ -71,9 +102,6 @@ export class ClienteComponent implements OnInit {
   }
 
   getBuscar() {
-    // if ( this.buscar.length === 0 ) {
-    //   return;
-    // }
     console.log('getBuscar');
     this.routers.navigateByUrl(`/cliente/${ this.buscar }/1`);
     this.listadoCliente();
@@ -92,26 +120,41 @@ export class ClienteComponent implements OnInit {
     this.cliente = new ClienteModel();
   }
 
-  editarCliente(cliente: ClienteModel) {
-    this.formulario = true;
-    this.cliente = cliente;
+  getCliente(Id: string) {
+    this.auth.getDatoId('Cliente', Id).subscribe( resp => this.cliente = resp);
     console.log(this.cliente);
-    this.forma = this.fb.group({
-      rut: [this.cliente.rut, [Validators.required, Validators.minLength(10)] ],
-      razonSocial: [this.cliente.razonSocial, [Validators.required, Validators.minLength(4)] ],
-      vigente: [this.cliente.vigente, Validators.required]
-    });
   }
 
-  editarVigente(cliente: ClienteModel) {
-    this.cliente = cliente;
-    console.log(this.cliente);
-    if ( this.cliente.vigente === true ) {
-      this.cliente.vigente = false;
-    } else {
-      this.cliente.vigente = true;
-    }
-    this.guardarVigente();
+  editarCliente(Id: string) {
+    this.formulario = true;
+    this.auth.getDatoId('Clientes', Id).subscribe( resp => {
+      this.cliente = {
+        ...resp,
+      };
+      console.log(this.cliente);
+
+      this.forma = this.fb.group({
+      rut: [this.cliente.rut, [Validators.required, Validators.minLength(9), Validators.maxLength(20)] ],
+      razonSocial: [this.cliente.razonSocial, [Validators.required, Validators.minLength(4), Validators.maxLength(20)] ],
+      vigente: [this.cliente.vigente, Validators.required]
+    });
+  });
+  }
+
+  editarVigente(Id: string) {
+    this.auth.getDatoId('Clientes', Id).subscribe( resp => {
+      this.cliente = {
+        ...resp,
+      };
+      console.log(Id);
+      console.log(this.cliente);
+      if ( this.cliente.vigente === true ) {
+        this.cliente.vigente = false;
+      } else {
+        this.cliente.vigente = true;
+      }
+      this.guardarVigente();
+  });
     this.forma.reset();
   }
 
@@ -124,7 +167,7 @@ export class ClienteComponent implements OnInit {
 
   guardarVigente() {
     console.log('Modificando: ' + this.cliente.id);
-    this.auth.putDato(this.cliente, 'Clientes').subscribe( resp => {
+    this.auth.putDato('Clientes', this.cliente).subscribe( resp => {
       console.log(resp);
       this.listadoCliente();
     });
@@ -143,14 +186,17 @@ export class ClienteComponent implements OnInit {
       });
     } else
     {
-      console.log(this.forma.value);
+      console.log(this.forma.value); /*
       this.cliente.rut = this.forma.value.rut;
       this.cliente.razonSocial = this.forma.value.razonSocial;
-      this.cliente.vigente = this.forma.value.vigente;
+      this.cliente.vigente = this.forma.value.vigente;*/
+      this.cliente = {
+        ...this.forma.value,
+      };
       console.log(this.cliente);
       if ( this.cliente.id ) {
         console.log('Modificando: ' + this.cliente.id);
-        this.auth.putDato(this.cliente, 'Clientes').subscribe( resp => {
+        this.auth.putDato('Clientes', this.cliente).subscribe( resp => {
           console.log(resp);
           this.listadoCliente();
         });
@@ -159,7 +205,7 @@ export class ClienteComponent implements OnInit {
       } else {
         console.log('Nuevo Cliente');
         this.auth.postDato(this.forma.value, 'Clientes').subscribe( resp => {
-          console.log(resp)
+          console.log(resp);
           this.listadoCliente();
         });
         this.formulario = false;
@@ -167,6 +213,83 @@ export class ClienteComponent implements OnInit {
       }
 
     }
+  }
+
+  finalDePaginas(): boolean {
+    if ( !this.page ) { this.page = '1'; }
+    // tslint:disable-next-line: radix
+    if(parseInt(this.page) === this.paginas) {
+      return true;
+    } else {return false; }
+  }
+
+  inicioDePaginas(): boolean {
+    if ( !this.page ) { this.page = '1'; }
+    if ( this.page === '1' ) { return true; }
+    else { return false; }
+  }
+
+  ordenBy(ordenPor: string, mostrar: boolean) {
+    console.log(mostrar);
+    if ( ordenPor === 'RUTAcending' || ordenPor === 'RUTDescending' ) {
+      if ( mostrar === false ) {
+        this.btnRut = true;
+        this.btnRazon = false;
+        this.btnVicen = false;
+        this.btnFecha = false;
+       }
+      else {
+        this.btnRut = false;
+        this.btnRazon = false;
+        this.btnVicen = false;
+        this.btnFecha = false;
+      }
+    }
+    if ( ordenPor === 'RazonSocialAcending' || ordenPor === 'RazonSocialDescending' ) {
+      if ( mostrar === false ) {
+        this.btnRazon = true;
+        this.btnVicen = false;
+        this.btnRut = false;
+        this.btnFecha = false;
+      }
+      else {
+        this.btnRazon = false;
+        this.btnVicen = false;
+        this.btnRut = false;
+        this.btnFecha = false;
+      }
+    }
+    if ( ordenPor === 'FechaDeCreacionAcending' || ordenPor === 'FechaDeCreacionDescending' ) {
+      if ( mostrar === false ) {
+        this.btnFecha = true;
+        this.btnRazon = false;
+        this.btnVicen = false;
+        this.btnRut = false;
+      }
+      else {
+        this.btnFecha = false;
+        this.btnRazon = false;
+        this.btnVicen = false;
+        this.btnRut = false;
+      }
+    }
+    if ( ordenPor === 'VigenteAcending' || ordenPor === 'VigenteDescending' ) {
+      if ( mostrar === false ) {
+        this.btnVicen = true;
+        this.btnRazon = false;
+        this.btnRut = false;
+        this.btnFecha = false;
+      }
+      else {
+        this.btnVicen = false;
+        this.btnRazon = false;
+        this.btnRut = false;
+        this.btnFecha = false;
+      }
+    }
+    this.orden = ordenPor;
+    console.log(this.orden);
+    this.listadoCliente();
   }
 
 
@@ -196,8 +319,8 @@ export class ClienteComponent implements OnInit {
   crearFormulario() {
 
     this.forma = this.fb.group({
-      rut: ['', [Validators.required, Validators.minLength(10)] ],
-      razonSocial: ['', [Validators.required, Validators.minLength(4)] ],
+      rut: ['', [Validators.required, Validators.minLength(9), Validators.maxLength(20)] ],
+      razonSocial: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(20)] ],
       vigente: [true, Validators.required]
     });
   }

@@ -28,41 +28,77 @@
             <table class="table">
                 <thead class="thead-dark">
                     <tr>
-                        <th>ID</th>
-                        <th>RUT</th>
-                        <th>Nombre</th>
-                        <th>Fecha Creado</th>
-                        <th>Vigente</th>
+                        <th>+</th>
+                        <th>
+                            <button class="btn" *ngIf="btnRut" (click)="ordenBy('RUTAcending', btnRut)">RUT<mat-icon>keyboard_arrow_down</mat-icon></button>
+                            <button class="btn" *ngIf="!btnRut" (click)="ordenBy('RUTDescending', btnRut)">RUT<mat-icon>keyboard_arrow_up</mat-icon></button>
+                        </th>
+                        <th>
+                            <button class="btn" *ngIf="btnRazon" (click)="ordenBy('RazonSocialAcending', btnRazon)">Nombre<mat-icon>keyboard_arrow_down</mat-icon></button>
+                            <button class="btn" *ngIf="!btnRazon" (click)="ordenBy('RazonSocialDescending', btnRazon)">Nombre<mat-icon>keyboard_arrow_up</mat-icon></button>
+                        </th>
+                        <th>
+                            <button class="btn" *ngIf="btnFecha" (click)="ordenBy('FechaDeCreacionAcending', btnFecha)">Fecha Creado<mat-icon>keyboard_arrow_down</mat-icon></button>
+                            <button class="btn" *ngIf="!btnFecha" (click)="ordenBy('FechaDeCreacionDescending', btnFecha)">Fecha Creado<mat-icon>keyboard_arrow_up</mat-icon></button>
+                        </th>
+                        <th>
+                            <button class="btn" *ngIf="btnVicen" (click)="ordenBy('VigenteAcending', btnVicen)">Vigente<mat-icon>keyboard_arrow_down</mat-icon></button>
+                            <button class="btn" *ngIf="!btnVicen" (click)="ordenBy('VigenteDescending', btnVicen)">Vigente<mat-icon>keyboard_arrow_up</mat-icon></button>
+                        </th>
                         <th></th>
                     </tr>
                 </thead>
-                <tbody *ngIf="registro">
+                <tbody *ngIf="total">
                     <tr *ngFor="let listados of listado; let i = index">
                         <td>
-                            <button class="btn btn-primary" (click)="editarCliente(listado[i])">{{ i + 1 }}</button>
+                            <button class="btn btn-primary" (click)="editarCliente(listado[i].id)"><mat-icon>edit</mat-icon></button>
                         </td>
                         <td>{{listados.rut}}</td>
                         <td>{{listados.razonSocial}}</td>
                         <td>{{listados.fechaDeCreacion | date:'dd/MM/yyyy' }}</td>
                         <td>{{vigenteCliente(listados.vigente)}}</td>
                         <td>
-                            <button class="btn btn-danger" *ngIf="listados.vigente" (click)="editarVigente(listado[i])">Desactivar</button>
-                            <button class="btn btn-primary" *ngIf="!listados.vigente" (click)="editarVigente(listado[i])">Activar</button>
+                            <button class="btn btn-danger" *ngIf="listados.vigente" (click)="editarVigente(listado[i].id)">Desactivar</button>
+                            <button class="btn btn-primary" *ngIf="!listados.vigente" (click)="editarVigente(listado[i].id)">Activar</button>
                         </td>
                     </tr>
                 </tbody>
-                <p *ngIf="!registro">No hay Clientes!</p>
+                <p *ngIf="!total">No hay Clientes!</p>
             </table>
 
         </div>
     </div>
     <div class="col-md-1 container">
         <div class="row">
-            <button class="btn" (click)="getPage(pages[0])">{{pages[0]}}</button>
-            <tr>_</tr>
-            <button class="btn" (click)="getPage(pages[1])">{{pages[1]}}</button>
-            <tr>_</tr>
-            <button class="btn" (click)="getPage(pages[2])">{{pages[2]}}</button>
+            <!-- foreach 
+            
+                - Los links de páginas del paginado.
+                - El editar funcionará a partir del identificador único y cargará nuevamente los datos del registro desde el backend.
+                - Modificar el link de EDITAR asociado al ID. Incluir un ícono para que sea el clic del editar el registro.
+                - Aplicar estos cambios también al CRUD de Productos.
+                - Probar el funcionamiento. (item importante)
+                - Iniciar con el mantenedor de Pedidos.
+            -->
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled" *ngIf="inicioDePaginas()">
+                    <a class="page-link">Anterior</a>
+                </li>
+                <li class="page-item" *ngIf="!inicioDePaginas()">
+                    <a class="page-link" (click)="pagAnterior()">Anterior</a>
+                </li>
+
+                <li *ngFor="let pag of arreglo(paginas); let i = index" class="page-item">
+                    <a class="page-link" (click)="getPage(i+1)">{{i+1}}</a>
+                </li>
+
+                <li class="page-item disabled" *ngIf="finalDePaginas()">
+                    <a class="page-link">Siguiente</a>
+                </li>
+                <li class="page-item" *ngIf="!finalDePaginas()">
+                    <a class="page-link" (click)="pagSiguiente()">Siguiente</a>
+                </li>
+            </ul>
+            <hr/>
         </div>
     </div>
 </div>

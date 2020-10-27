@@ -12,6 +12,8 @@ const routes: Routes = [
   { path: 'cliente/:pag' , component: ClienteComponent },
   { path: 'cliente/:buscar/:pag' , component: ClienteComponent },
   { path: 'producto' , component: ProductoComponent },
+  { path: 'producto/:pag' , component: ProductoComponent },
+  { path: 'producto/:buscar/:pag' , component: ProductoComponent },
   { path: 'login' , component: LoginComponent },
   { path: '**' , pathMatch: 'full', redirectTo: 'login' }
 ];

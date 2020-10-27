@@ -1,51 +1,128 @@
 <app-navbar></app-navbar>
 
-<div class="row">
-    <div class="col-md-5 container">
-        <h1>Lista Productos</h1>
+<div *ngIf="!formulario">
+    <div class="row">
+        <div class="col-md-5 container">
+            <h1>Lista Productos</h1>
+        </div>
+    </div>
+    <tr></tr>
+    <div class="row">
+        <div class="col-md-2 container">
+            <input [(ngModel)]="buscar" name="buscar" (keyup.enter)="getBuscar()" type="text" class="form-control" placeholder="Buscar un dato">
+            <button class="btn btn-primary" type="submit" (click)="getBuscar()">Buscar</button>
+        </div>
+
+
+        <div class="col-md-2 container">
+            <button class="btn btn-primary" (click)="agregarProducto()">Agregar Producto</button>
+        </div>
+    </div>
+    <tr></tr>
+    <tr></tr>
+    <div class="row">
+        <div class="col-md-8 container">
+
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>+</th>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Valor</th>
+                        <th>Vigente</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody *ngIf="total">
+                    <tr *ngFor="let listados of listado; let i = index">
+                        <td>
+                            <button class="btn btn-primary" (click)="editarProducto(listado[i].id)"><mat-icon>edit</mat-icon></button>
+                        </td>
+                        <td>{{listados.codigo}}</td>
+                        <td>{{listados.nombre}}</td>
+                        <td>{{listados.valor}}</td>
+                        <td>{{vigenteProducto(listados.vigente)}}</td>
+                        <td>
+                            <button class="btn btn-danger" *ngIf="listados.vigente" (click)="editarVigente(listado[i].id)">Desactivar</button>
+                            <button class="btn btn-primary" *ngIf="!listados.vigente" (click)="editarVigente(listado[i].id)">Activar</button>
+                        </td>
+                    </tr>
+                </tbody>
+                <p *ngIf="!total">No hay Productos!</p>
+            </table>
+
+        </div>
+    </div>
+    <div class="col-md-1 container">
+        <div class="row">
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                </li>
+
+                <li *ngFor="let pag of arreglo(paginas); let i = index" class="page-item"><a class="page-link" (click)="getPage(i+1)">{{i+1}}</a></li>
+
+                <li class="page-item">
+                    <a class="page-link" href="#">Siguiente</a>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>
-<tr></tr>
-<div class="row">
-    <div class="col-md-2 container">
-        <input>
-        <button class="btn btn-primary">Buscar</button>
+<th></th>
+
+<div *ngIf="formulario">
+    <div class="row">
+        <div class="col-md-5 container">
+            <h1>Cliente</h1>
+        </div>
     </div>
+    <tr></tr>
+    <tr></tr>
+    <form autocomplete="off" [formGroup]="forma" (ngSubmit)="guardar()" class="container">
+        <div>
+            <div class="form-group row">
+                <label class="col-2 col-form-label">Codigo</label>
+                <div class="col-8">
+                    <input class="form-control" type="text" placeholder="codigo" formControlName="codigo" [class.is-invalid]="codigoNoValido">
+                    <small *ngIf="codigoNoValido" class="text-danger">Ingrese Codigo</small>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-2 col-form-label">Nombre</label>
+                <div class="col-8">
+                    <input class="form-control" type="text" placeholder="nombre" formControlName="nombre" [class.is-invalid]="nombreNoValido">
+                    <small *ngIf="nombreNoValido" class="text-danger">Ingrese Nombre</small>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-2 col-form-label">Valor</label>
+                <div class="col-8">
+                    <input class="form-control" type="text" placeholder="valor" formControlName="valor" [class.is-invalid]="valorNoValido">
+                    <small *ngIf="valorNoValido" class="text-danger">Ingrese Valor</small>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-2 col-form-label">Vigente</label>
+                <div class="col-8">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="vigente" value="1" formControlName="vigente" [class.is-invalid]="vigenteNoValido">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-8">
+                    <button class="btn btn-primary" type="button" (click)="guardar()">Guardar</button>
+                </div>
+            </div>
 
+            <div class="form-group row">
+                <div class="col-8">
+                    <button class="btn btn-primary" type="button" (click)="volver()">Volver</button>
+                </div>
+            </div>
 
-    <div class="col-md-2 container">
-        <button class="btn btn-primary">Agregar Productos</button>
-    </div>
-</div>
-<tr></tr>
-<tr></tr>
-<div class="row">
-    <div class="col-md-8 container">
-
-        <table class="table">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Código</th>
-                    <th>Nombre</th>
-                    <th>Valor</th>
-                    <th>Vigente</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody *ngIf="registro">
-                <tr *ngFor="let listados of listado">
-                    <td>{{listados.codigo}}</td>
-                    <td>{{listados.nombre}}</td>
-                    <td>{{listados.valor}}</td>
-                    <td>{{vigenteProducto(listados.vigente)}}</td>
-                    <td>
-                        <button class="btn btn-danger" *ngIf="listados.vigente">Desactivar</button>
-                        <button class="btn btn-primary" *ngIf="!listados.vigente">Activar</button>
-                    </td>
-                </tr>
-            </tbody>
-            <p *ngIf="!registro">No hay Productos!</p>
-        </table>
-
-    </div>
+        </div>
+    </form>
 </div>
