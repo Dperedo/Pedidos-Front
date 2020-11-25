@@ -1,8 +1,10 @@
+import { variable } from '@angular/compiler/src/output/output_ast';
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { ProductoModel } from '../../models/producto.model';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-producto',
@@ -20,7 +22,6 @@ export class ProductoComponent implements OnInit {
   total = 0;
   paginas = 1;
   orden = '';
-  // tslint:disable-next-line: new-parens
   producto: ProductoModel = new ProductoModel();
 
   constructor(
@@ -40,14 +41,20 @@ export class ProductoComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  ordenBy(ordenPor: string) {
-    this.orden = ordenPor;
-    this.listadoProducto();
+  pagAnterior() {
+    // tslint:disable-next-line: prefer-const
+    // tslint:disable-next-line: radix
+    const dato = parseInt(this.page) - 1;
+    this.page = dato.toString();
+    this.getPage(this.page);
   }
 
-  paginasDelTotal() {
-    this.paginas = Math.ceil(this.total / 10);
-    console.log('paginas==' + this.paginas);
+  pagSiguiente() {
+    // tslint:disable-next-line: prefer-const
+    // tslint:disable-next-line: radix
+    const dato = parseInt(this.page) + 1;
+    this.page = dato.toString();
+    this.getPage(this.page);
   }
 
   arreglo(n: number) {
@@ -68,11 +75,12 @@ export class ProductoComponent implements OnInit {
 
   listadoProducto() {
 
-    console.log('listadoCliente');
+    console.log('listadoProducto');
     this.auth.getDato('Productos', this.buscar, this.page, this.orden).subscribe(
       resp => {
         this.listado = resp['list'];
         this.total = resp['total'];
+        this.paginas = resp['numpages'];
         console.log(resp);
       }
     );
@@ -105,7 +113,7 @@ export class ProductoComponent implements OnInit {
   }
 
   getProducto(Id: string) {
-    this.auth.getDatoId('Producto', Id).subscribe( resp => this.producto = resp);
+    this.auth.getDatoId('Productos', Id).subscribe( resp => this.producto = resp);
     console.log(this.producto);
   }
 
@@ -119,26 +127,39 @@ export class ProductoComponent implements OnInit {
       this.forma = this.fb.group({
       codigo: [this.producto.codigo, [Validators.required, Validators.minLength(5), Validators.maxLength(20)] ],
       nombre: [this.producto.nombre, [Validators.required, Validators.minLength(4), Validators.maxLength(20)] ],
-      valor: [this.producto.valor, [Validators.required, Validators.minLength(4), Validators.maxLength(20)] ],
+      precio: [this.producto.precio, [Validators.required, Validators.minLength(4),
+        Validators.maxLength(20), Validators.pattern('^[0-9]+$')] ],
       vigente: [this.producto.vigente, Validators.required]
       });
     });
   }
 
-  editarVigente(Id: string) {
-    this.auth.getDatoId('Productos', Id).subscribe( resp => {
-      this.producto = {
-        ...resp,
-      };
-      console.log(this.producto);
-      if ( this.producto.vigente === true ) {
-        this.producto.vigente = false;
-      } else {
-        this.producto.vigente = true;
-      }
-      this.guardarVigente();
-    });
-    this.forma.reset();
+  editarVigente(Id: string, point: number) {
+    Swal.fire({
+      type: 'question',
+      confirmButtonText: 'Confirmar',
+      cancelButtonText: 'cancelar',
+      showConfirmButton: true,
+      showCancelButton: true,
+      html: 'Seguro que quiere realizar este cambio'
+    }).then((result) => {
+      if ( result.value ) {
+        this.auth.getDatoId('Productos', Id).subscribe( resp => {
+          this.producto = {
+            ...resp,
+          };
+          console.log(this.producto);
+          if ( this.producto.vigente === true ) {
+            this.producto.vigente = false;
+            this.listado[point].vigente = false;
+          } else {
+            this.producto.vigente = true;
+            this.listado[point].vigente = true;
+          }
+          this.guardarVigente();
+        });
+        this.forma.reset();
+      }});
   }
 
   volver() {
@@ -152,7 +173,6 @@ export class ProductoComponent implements OnInit {
     console.log('Modificando: ' + this.producto.id);
     this.auth.putDato('Productos', this.producto).subscribe( resp => {
       console.log(resp);
-      this.listadoProducto();
     });
   }
 
@@ -172,7 +192,7 @@ export class ProductoComponent implements OnInit {
       console.log(this.forma.value);
       this.producto.codigo = this.forma.value.codigo;
       this.producto.nombre = this.forma.value.nombre;
-      this.producto.valor = this.forma.value.valor;
+      this.producto.precio = this.forma.value.precio;
       this.producto.vigente = this.forma.value.vigente;
       console.log(this.producto);
       if ( this.producto.id ) {
@@ -202,6 +222,25 @@ export class ProductoComponent implements OnInit {
     return parseInt(this.page);
   }
 
+  finalDePaginas(): boolean {
+    if ( !this.page ) { this.page = '1'; }
+    // tslint:disable-next-line: radix
+    if ( parseInt(this.page) === this.paginas) {
+      return true;
+    } else {return false; }
+  }
+
+  inicioDePaginas(): boolean {
+    if ( !this.page ) { this.page = '1'; }
+    if ( this.page === '1' ) { return true; }
+    else { return false; }
+  }
+
+  ordenBy(ordenPor: string) {
+    this.orden = ordenPor;
+    this.listadoProducto();
+  }
+
   // ---------------------------------------------------------------------------------
   // ---------------------------------------------------------------------------------
 
@@ -221,8 +260,8 @@ export class ProductoComponent implements OnInit {
   }
 
   // tslint:disable-next-line: typedef
-  get valorNoValido() {
-    return this.forma.get('valor').invalid && this.forma.get('valor').touched;
+  get precioNoValido() {
+    return this.forma.get('precio').invalid && this.forma.get('precio').touched;
   }
 
   // tslint:disable-next-line: typedef
@@ -235,7 +274,7 @@ export class ProductoComponent implements OnInit {
     this.forma = this.fb.group({
       codigo: ['', [Validators.required, Validators.minLength(5)] ],
       nombre: ['', [Validators.required, Validators.minLength(4)] ],
-      valor: ['', [Validators.required, Validators.minLength(4)] ],
+      precio: ['', [Validators.required, Validators.minLength(4)] ],
       vigente: [true, Validators.required]
     });
   }

@@ -3,6 +3,6 @@ export class ProductoModel {
     id: string;
     codigo: string;
     nombre: string;
-    valor: number;
+    precio: number;
     vigente: boolean;
 }

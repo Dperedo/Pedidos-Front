@@ -6,6 +6,9 @@ import { AppRoutingModule } from './app-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { JwPaginationModule } from 'jw-angular-pagination';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
@@ -13,6 +16,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
 import { ClienteComponent } from './pages/cliente/cliente.component';
 import { ProductoComponent } from './pages/producto/producto.component';
+import { PedidoComponent } from './pages/pedido/pedido.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +26,7 @@ import { ProductoComponent } from './pages/producto/producto.component';
     LoginComponent,
     ClienteComponent,
     ProductoComponent,
+    PedidoComponent,
   ],
   imports: [
     BrowserModule,
@@ -30,7 +35,10 @@ import { ProductoComponent } from './pages/producto/producto.component';
     HttpClientModule,
     ReactiveFormsModule,
     JwPaginationModule,
-    MatIconModule
+    MatIconModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatInputModule
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -31,43 +31,15 @@ export class AuthService {
     return this.http.get(`${ this.url }/Usuarios/auth`, { headers });
   }
 
-  getCliente(){
+  getSelector(controlador: string){
     // const url = 'https://localhost:5001/api/Usuarios';
     this.userToken = this.leerToken();
 
     const headers = new HttpHeaders({
       Authorization: `Bearer ${ this.userToken }`
     });
-    console.log('Dentro de getCliente');
-    return this.http.get(`${ this.url }/Clientes`).pipe(map((res: any) => res));
-  }
-
-  postCliente(cliente: ClienteModel){
-    const Data = {
-      ...cliente,
-    };
-    this.userToken = this.leerToken();
-
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${ this.userToken }`
-    });
-    console.log('Dentro de postCliente');
-    console.log(Data);
-    return this.http.post(`${ this.url }/Clientes`, Data).pipe(map((res: any) => res));
-  }
-
-  putCliente(cliente: ClienteModel){
-    const Data = {
-      ...cliente,
-    };
-    this.userToken = this.leerToken();
-
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${ this.userToken }`
-    });
-    console.log('Dentro de pustCliente');
-    console.log(Data);
-    return this.http.put(`${ this.url }/Clientes/${ Data.id }`, Data).pipe(map((res: any) => res));
+    console.log('Dentro de getEstado');
+    return this.http.get(`${ this.url }/${ controlador }`).pipe(map((res: any) => res));
   }
 
   // ----------------------------------------------------------------------------------------------------------
@@ -89,7 +61,8 @@ export class AuthService {
     console.log('page=' + page, 'buscar=' + buscar, 'orden=' + orden);
     console.log('Dentro de getDatoBuscar');
 
-    return this.http.get(`${ this.url }/${ controlador }/query?texto=${ buscar }&page=${ page }&order=${ orden }`).pipe(map((res: any) => res ));
+    return this.http.get(`${ this.url }/${ controlador }/query?texto=${ buscar }&page=${ page }&order=${ orden }`)
+      .pipe(map((res: any) => res ));
   }
 
   getDatoId(controlador: string, ID: string) {

@@ -26,59 +26,62 @@
         <div class="col-md-8 container">
 
             <table class="table">
+
                 <thead class="thead-dark">
                     <tr>
+
                         <th>+</th>
                         <th>
-                            <button class="btn" *ngIf="btnRut" (click)="ordenBy('RUTAcending', btnRut)">RUT<mat-icon>keyboard_arrow_down</mat-icon></button>
-                            <button class="btn" *ngIf="!btnRut" (click)="ordenBy('RUTDescending', btnRut)">RUT<mat-icon>keyboard_arrow_up</mat-icon></button>
+
+                            <button class="btn" *ngIf="orden!='RUTAcending'" (click)="ordenBy('RUTAcending')">RUT</button>
+                            <button class="btn" *ngIf="orden=='RUTAcending'" (click)="ordenBy('RUTDescending')">RUT</button>
+                            <mat-icon *ngIf="orden=='RUTDescending'">keyboard_arrow_down</mat-icon>
+                            <mat-icon *ngIf="orden=='RUTAcending'">keyboard_arrow_up</mat-icon>
                         </th>
                         <th>
-                            <button class="btn" *ngIf="btnRazon" (click)="ordenBy('RazonSocialAcending', btnRazon)">Nombre<mat-icon>keyboard_arrow_down</mat-icon></button>
-                            <button class="btn" *ngIf="!btnRazon" (click)="ordenBy('RazonSocialDescending', btnRazon)">Nombre<mat-icon>keyboard_arrow_up</mat-icon></button>
+                            <button class="btn" *ngIf="orden!='RazonSocialAcending'" (click)="ordenBy('RazonSocialAcending')">Nombre</button>
+                            <button class="btn" *ngIf="orden=='RazonSocialAcending'" (click)="ordenBy('RazonSocialDescending')">Nombre</button>
+                            <mat-icon *ngIf="orden=='RazonSocialDescending'">keyboard_arrow_down</mat-icon>
+                            <mat-icon *ngIf="orden=='RazonSocialAcending'">keyboard_arrow_up</mat-icon>
                         </th>
                         <th>
-                            <button class="btn" *ngIf="btnFecha" (click)="ordenBy('FechaDeCreacionAcending', btnFecha)">Fecha Creado<mat-icon>keyboard_arrow_down</mat-icon></button>
-                            <button class="btn" *ngIf="!btnFecha" (click)="ordenBy('FechaDeCreacionDescending', btnFecha)">Fecha Creado<mat-icon>keyboard_arrow_up</mat-icon></button>
+                            <button class="btn" *ngIf="orden!='FechaDeCreacionAcending'" (click)="ordenBy('FechaDeCreacionAcending')">Fecha Creado</button>
+                            <button class="btn" *ngIf="orden=='FechaDeCreacionAcending'" (click)="ordenBy('FechaDeCreacionDescending')">Fecha Creado</button>
+                            <mat-icon *ngIf="orden=='FechaDeCreacionDescending'">keyboard_arrow_down</mat-icon>
+                            <mat-icon *ngIf="orden=='FechaDeCreacionAcending'">keyboard_arrow_up</mat-icon>
                         </th>
                         <th>
-                            <button class="btn" *ngIf="btnVicen" (click)="ordenBy('VigenteAcending', btnVicen)">Vigente<mat-icon>keyboard_arrow_down</mat-icon></button>
-                            <button class="btn" *ngIf="!btnVicen" (click)="ordenBy('VigenteDescending', btnVicen)">Vigente<mat-icon>keyboard_arrow_up</mat-icon></button>
+                            <button class="btn" *ngIf="orden!='VigenteAcending'" (click)="ordenBy('VigenteAcending')">Vigente</button>
+                            <button class="btn" *ngIf="orden=='VigenteAcending'" (click)="ordenBy('VigenteDescending')">Vigente</button>
+                            <mat-icon *ngIf="orden=='VigenteDescending'">keyboard_arrow_down</mat-icon>
+                            <mat-icon *ngIf="orden=='VigenteAcending'">keyboard_arrow_up</mat-icon>
                         </th>
                         <th></th>
                     </tr>
                 </thead>
-                <tbody *ngIf="total">
+                <tbody>
                     <tr *ngFor="let listados of listado; let i = index">
                         <td>
                             <button class="btn btn-primary" (click)="editarCliente(listado[i].id)"><mat-icon>edit</mat-icon></button>
                         </td>
-                        <td>{{listados.rut}}</td>
+                        <td data-title="'RUT'" sortable="'RUT'">{{listados.rut}}</td>
                         <td>{{listados.razonSocial}}</td>
                         <td>{{listados.fechaDeCreacion | date:'dd/MM/yyyy' }}</td>
                         <td>{{vigenteCliente(listados.vigente)}}</td>
                         <td>
-                            <button class="btn btn-danger" *ngIf="listados.vigente" (click)="editarVigente(listado[i].id)">Desactivar</button>
-                            <button class="btn btn-primary" *ngIf="!listados.vigente" (click)="editarVigente(listado[i].id)">Activar</button>
+                            <button class="btn btn-danger" *ngIf="listados.vigente" (click)="editarVigente(listado[i].id,i)">Desactivar</button>
+                            <button class="btn btn-primary" *ngIf="!listados.vigente" (click)="editarVigente(listado[i].id,i)">Activar</button>
                         </td>
                     </tr>
+                    <p *ngIf="!total">No hay Clientes!</p>
                 </tbody>
-                <p *ngIf="!total">No hay Clientes!</p>
             </table>
-
         </div>
     </div>
+
+
     <div class="col-md-1 container">
         <div class="row">
-            <!-- foreach 
-            
-                - Los links de páginas del paginado.
-                - El editar funcionará a partir del identificador único y cargará nuevamente los datos del registro desde el backend.
-                - Modificar el link de EDITAR asociado al ID. Incluir un ícono para que sea el clic del editar el registro.
-                - Aplicar estos cambios también al CRUD de Productos.
-                - Probar el funcionamiento. (item importante)
-                - Iniciar con el mantenedor de Pedidos.
-            -->
             <ul class="pagination justify-content-center">
                 <li class="page-item disabled" *ngIf="inicioDePaginas()">
                     <a class="page-link">Anterior</a>
@@ -102,6 +105,7 @@
         </div>
     </div>
 </div>
+
 <th></th>
 
 <div *ngIf="formulario">
@@ -150,4 +154,7 @@
 
         </div>
     </form>
+</div>
+<div>
+    <pre>{{forma.value | json}}</pre>
 </div>

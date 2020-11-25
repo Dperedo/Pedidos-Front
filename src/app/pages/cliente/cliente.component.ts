@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { ClienteModel } from '../../models/cliente.model';
 import { FormArray, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-cliente',
@@ -22,10 +23,6 @@ export class ClienteComponent implements OnInit {
   total = 0;
   paginas = 1;
   orden = '';
-  btnRut = false;
-  btnRazon = false;
-  btnFecha = true;
-  btnVicen = false;
   // tslint:disable-next-line: new-parens
   cliente: ClienteModel = new ClienteModel();
 
@@ -69,8 +66,11 @@ export class ClienteComponent implements OnInit {
   leerParametros() {
     this.router.params.subscribe( parametros => {
       console.log('parametro = ', parametros);
+      // tslint:disable-next-line: no-string-literal
       this.page = parametros['pag'];
+      // tslint:disable-next-line: no-string-literal
       if ( parametros['buscar'] ) {
+        // tslint:disable-next-line: no-string-literal
         this.buscar = parametros['buscar'];
         this.getBuscar();
       }
@@ -84,8 +84,11 @@ export class ClienteComponent implements OnInit {
     console.log('listadoCliente');
     this.auth.getDato('Clientes', this.buscar, this.page, this.orden).subscribe(
       resp => {
+        // tslint:disable-next-line: no-string-literal
         this.listado = resp['list'];
+        // tslint:disable-next-line: no-string-literal
         this.total = resp['total'];
+        // tslint:disable-next-line: no-string-literal
         this.paginas = resp['numpages'];
         console.log(this.listado);
         console.log(this.total);
@@ -121,11 +124,12 @@ export class ClienteComponent implements OnInit {
   }
 
   getCliente(Id: string) {
-    this.auth.getDatoId('Cliente', Id).subscribe( resp => this.cliente = resp);
+    this.auth.getDatoId('Clientes', Id).subscribe( resp => this.cliente = resp);
     console.log(this.cliente);
   }
 
   editarCliente(Id: string) {
+    console.log(this.formulario);
     this.formulario = true;
     this.auth.getDatoId('Clientes', Id).subscribe( resp => {
       this.cliente = {
@@ -137,25 +141,37 @@ export class ClienteComponent implements OnInit {
       rut: [this.cliente.rut, [Validators.required, Validators.minLength(9), Validators.maxLength(20)] ],
       razonSocial: [this.cliente.razonSocial, [Validators.required, Validators.minLength(4), Validators.maxLength(20)] ],
       vigente: [this.cliente.vigente, Validators.required]
+      });
     });
-  });
   }
 
-  editarVigente(Id: string) {
-    this.auth.getDatoId('Clientes', Id).subscribe( resp => {
-      this.cliente = {
-        ...resp,
-      };
-      console.log(Id);
-      console.log(this.cliente);
-      if ( this.cliente.vigente === true ) {
-        this.cliente.vigente = false;
-      } else {
-        this.cliente.vigente = true;
-      }
-      this.guardarVigente();
-  });
-    this.forma.reset();
+  editarVigente(Id: string, point: number) {
+    Swal.fire({
+      type: 'question',
+      confirmButtonText: 'Confirmar',
+      cancelButtonText: 'cancelar',
+      showConfirmButton: true,
+      showCancelButton: true,
+      html: 'Seguro que quiere realizar este cambio'
+    }).then((result) => {
+      if ( result.value ) {
+        this.auth.getDatoId('Clientes', Id).subscribe( resp => {
+          this.cliente = {
+            ...resp,
+          };
+          console.log(Id);
+          console.log(this.cliente);
+          if ( this.cliente.vigente === true ) {
+            this.cliente.vigente = false;
+            this.listado[point].vigente = false;
+          } else {
+            this.cliente.vigente = true;
+            this.listado[point].vigente = true;
+          }
+          this.guardarVigente();
+        });
+        this.forma.reset();
+      }});
   }
 
   volver() {
@@ -169,7 +185,6 @@ export class ClienteComponent implements OnInit {
     console.log('Modificando: ' + this.cliente.id);
     this.auth.putDato('Clientes', this.cliente).subscribe( resp => {
       console.log(resp);
-      this.listadoCliente();
     });
   }
 
@@ -218,7 +233,7 @@ export class ClienteComponent implements OnInit {
   finalDePaginas(): boolean {
     if ( !this.page ) { this.page = '1'; }
     // tslint:disable-next-line: radix
-    if(parseInt(this.page) === this.paginas) {
+    if (parseInt(this.page) === this.paginas) {
       return true;
     } else {return false; }
   }
@@ -229,64 +244,7 @@ export class ClienteComponent implements OnInit {
     else { return false; }
   }
 
-  ordenBy(ordenPor: string, mostrar: boolean) {
-    console.log(mostrar);
-    if ( ordenPor === 'RUTAcending' || ordenPor === 'RUTDescending' ) {
-      if ( mostrar === false ) {
-        this.btnRut = true;
-        this.btnRazon = false;
-        this.btnVicen = false;
-        this.btnFecha = false;
-       }
-      else {
-        this.btnRut = false;
-        this.btnRazon = false;
-        this.btnVicen = false;
-        this.btnFecha = false;
-      }
-    }
-    if ( ordenPor === 'RazonSocialAcending' || ordenPor === 'RazonSocialDescending' ) {
-      if ( mostrar === false ) {
-        this.btnRazon = true;
-        this.btnVicen = false;
-        this.btnRut = false;
-        this.btnFecha = false;
-      }
-      else {
-        this.btnRazon = false;
-        this.btnVicen = false;
-        this.btnRut = false;
-        this.btnFecha = false;
-      }
-    }
-    if ( ordenPor === 'FechaDeCreacionAcending' || ordenPor === 'FechaDeCreacionDescending' ) {
-      if ( mostrar === false ) {
-        this.btnFecha = true;
-        this.btnRazon = false;
-        this.btnVicen = false;
-        this.btnRut = false;
-      }
-      else {
-        this.btnFecha = false;
-        this.btnRazon = false;
-        this.btnVicen = false;
-        this.btnRut = false;
-      }
-    }
-    if ( ordenPor === 'VigenteAcending' || ordenPor === 'VigenteDescending' ) {
-      if ( mostrar === false ) {
-        this.btnVicen = true;
-        this.btnRazon = false;
-        this.btnRut = false;
-        this.btnFecha = false;
-      }
-      else {
-        this.btnVicen = false;
-        this.btnRazon = false;
-        this.btnRut = false;
-        this.btnFecha = false;
-      }
-    }
+  ordenBy(ordenPor: string) {
     this.orden = ordenPor;
     console.log(this.orden);
     this.listadoCliente();
