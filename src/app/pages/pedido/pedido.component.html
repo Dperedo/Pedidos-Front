@@ -1,5 +1,5 @@
 <app-navbar></app-navbar>
-<div *ngIf="false">
+<div *ngIf="!formulario">
     <div class="row">
         <div class="col-md-5 container">
             <h1>Lista Pedidos</h1>
@@ -14,7 +14,7 @@
             <span>buscar</span>
             <input [(ngModel)]="buscar" name="buscar" (keyup.enter)="getBuscar()" type="text" class="form-control" placeholder="Buscar un dato">
             <span>estado</span>
-            <select class="form-control" name="estado">
+            <select class="form-control" name="estadoBuscar">
             <option value="" selected>Seleccione un Estado</option>
             <option *ngFor="let estado of estados">{{estado.estadoPedido}}</option>
         </select>
@@ -47,7 +47,7 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let listados of listado; let i = index">
-                        <td><button class="btn btn-primary">{{listados.secuencial}}</button></td>
+                        <td><button class="btn btn-primary" (click)="editarPedido(listados.id)">{{listados.secuencial}}</button></td>
                         <td>{{listados.fechaDeCreacion | date:'dd/MM/yyyy'}}</td>
                         <td>{{listados.cliente.razonSocial}}</td>
                         <td>{{listados.detallePedidos[0].producto.nombre}}</td>
@@ -62,168 +62,125 @@
             </table>
         </div>
     </div>
-</div>
-<div class="col-md-1 container">
-    <div class="row">
-        <ul class="pagination justify-content-center">
-            <li class="page-item disabled" *ngIf="inicioDePaginas()">
-                <a class="page-link">Anterior</a>
-            </li>
-            <li class="page-item" *ngIf="!inicioDePaginas()">
-                <a class="page-link" (click)="pagAnterior()">Anterior</a>
-            </li>
 
-            <li *ngFor="let pag of arreglo(paginas); let i = index" class="page-item">
-                <a class="page-link" (click)="getPage(i+1)">{{i+1}}</a>
-            </li>
+    <div class="col-md-1 container">
+        <div class="row">
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled" *ngIf="inicioDePaginas()">
+                    <a class="page-link">Anterior</a>
+                </li>
+                <li class="page-item" *ngIf="!inicioDePaginas()">
+                    <a class="page-link" (click)="pagAnterior()">Anterior</a>
+                </li>
 
-            <li class="page-item disabled" *ngIf="finalDePaginas()">
-                <a class="page-link">Siguiente</a>
-            </li>
-            <li class="page-item" *ngIf="!finalDePaginas()">
-                <a class="page-link" (click)="pagSiguiente()">Siguiente</a>
-            </li>
-        </ul>
-        <hr/>
-    </div>
-</div>
+                <li *ngFor="let pag of arreglo(paginas); let i = index" class="page-item">
+                    <a class="page-link" (click)="getPage(i+1)">{{i+1}}</a>
+                </li>
 
-<div [formGroup]="forma">
-    <div class="row">
-        <div class="col-md-5 container">
-            <h1>Pedido</h1>
+                <li class="page-item disabled" *ngIf="finalDePaginas()">
+                    <a class="page-link">Siguiente</a>
+                </li>
+                <li class="page-item" *ngIf="!finalDePaginas()">
+                    <a class="page-link" (click)="pagSiguiente()">Siguiente</a>
+                </li>
+            </ul>
+            <hr/>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-md-3 container">
-            <span>Cliente</span>
-            <select class="form-control" name="cliente" formControlName="cliente">
-            <option value="" selected>Seleccione un Cliente</option>
-            <option *ngFor="let cliente of clientes">{{cliente.razonSocial}}</option>
-        </select>
-        </div>
-    </div>
-    <tr></tr>
-    <tr></tr>
-    <div class="row">
-        <div class="col-md-8 container">
-            <table class="table">
-                <thead class="thead-dark">
-                    <tr>
-                        <th></th>
-                        <th>Producto</th>
-                        <th>Nombre Producto</th>
-                        <th>Valor</th>
-                        <th>Cantidad</th>
-                        <th>Subtotal</th>
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <tbody formArrayName="productosForm">
-                    <tr *ngFor="let control of productosForm.controls; let i = index">
-                        <td>{{i+1}}</td>
-                        <td>
-                            <select class="form-control" name="productoSelect" [formControlName]="i" #selProducto (change)="selectProducto(selProducto.value,i)">
-                            <option value="" selected>Seleccione un Producto</option>
-                            <option *ngFor="let listaProducto of productos" [ngValue]="listaProducto">{{listaProducto.nombre}}</option>
-                        </select>
-                        </td>
-                        <td>{{productosForm.value[i].nombre}}</td>
-                        <td>{{productosForm.value[i].precio}}</td>
-                        <td>
-                            <input class="form-control" name="cantidadForm" [formControlName]="'cant_' + i" #cantProducto type="text" placeholder="cantidad" (keyup)="updateSubtotal(cantProducto.value,i)">
-                        </td>
-                        <td>{{productosForm.value[i].subtotal}}</td>
-                        <td><button class="btn btn-danger" (click)="borrarProducto(i)">Quitar</button></td>
-                    </tr>
-                </tbody>
-                <button class="btn btn-primary" type="button" (click)="agregarProducto()">Agregar Producto</button>
-            </table>
-            <pre>{{forma.value | json}}</pre>
-        </div>
-        <div class="col-md-8 container">
-            <span>Observaciones</span>
-            <input class="form-control" name="observaciones" formControlName="observaciones" type="text" style="width:500px;height:150px">
-        </div>
-        <div class="col-md-8 container">
-            <span>Neto</span>
-            <label></label>
-            <th></th>
-            <span>Iva</span>
-            <th></th>
-            <span>Total</span>
-            <th></th>
-        </div>
-
     </div>
 </div>
-<!--                      -->
-<div>
-    <form [formGroup]="addressForm" class="container mt-3" (ngSubmit)="logValue()">
-        <div class="row justify-content-center">
-            <div class="col-6">
-                <button type="button" class="btn btn-primary mb-2" (click)="addAddress()">Add Address</button>
-                <div class="form-group">
-                    <span>hola</span>
-                    <input class="form-control" type="text" formControlName="algo" placeholder="hola">
+<div *ngIf="formulario">
+    <div>
+        <form [formGroup]="forma">
+            <div class="row">
+                <div class="col-md-5 container">
+                    <h1>Pedido</h1>
                 </div>
-                <section class="container border mb-4 p-3" formArrayName="addresses" *ngFor="let address of addressControls; let i = index;">
-                    <div [formGroupName]="i">
-                        <div class="row">
-                            <div class="col-6">
-                                <h4>Address {{i + 1}}</h4>
-                            </div>
-                            <div class="col-6 text-right">
-                                <button type="button" class="btn btn-danger btn-sm" (click)="removeAddress(i)">Remove</button>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label>Address</label>
-                                    <input type="text" class="form-control" formControlName="address" placeholder="St. Thomas Apartment" />
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label>Street</label>
-                                    <input type="text" class="form-control" formControlName="street" placeholder="South Street" />
-                                </div>
-                            </div>
-                        </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 container">
+                    <span>Cliente</span>
+                    <select class="form-control" name="cliente" formControlName="cliente">
+                    <option value="" selected>Seleccione un Cliente</option>
+                    <option *ngFor="let cliente of clientes" [selected]="forma.value.cliente.id === cliente.id" [ngValue]="cliente">{{cliente.razonSocial}}</option>
+                    </select>
+                    <small *ngIf="clienteNoValido" class="text-danger">Seleccione Cliente</small>
+                </div>
+                <div class="col-md-3 container" *ngIf="editar">
+                    <span>Estado</span>
+                    <select class="form-control" name="estado" formControlName="estado">
+                    <option *ngFor="let estado of estados" [ngValue]="estado" [selected]="forma.value.estado.id === estado.id">{{estado.estadoPedido}}</option>
+                    </select>
+                </div>
+            </div>
+            <tr></tr>
+            <tr></tr>
+            <div class="row">
+                <div class="col-md-8 container">
+                    <table class="table">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th></th>
+                                <th>Producto</th>
+                                <th>Nombre Producto</th>
+                                <th>Valor</th>
+                                <th>Cantidad</th>
+                                <th>Subtotal</th>
+                                <th></th>
+                            </tr>
+                        </thead>
 
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label>City</label>
-                                    <input type="text" class="form-control" formControlName="city" placeholder="Mumbai" />
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label>Country</label>
-                                    <select class="form-control" formControlName="country" placeholder="India">
-                            <option value="india">India</option>
-                            <option value="usa">USA</option>
-                            <option value="england">England</option>
-                          </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        <tbody *ngFor="let producto of detallePedidosControls; let i = index" formArrayName="detallePedidos">
+                            <tr [formGroupName]="i">
 
-                </section>
+                                <td>{{i+1}}</td>
+                                <td>
+                                    <select class="form-control" name="productoSelect" formControlName="producto" (blur)="calcularTotal()">
+                                    <option value="" selected>Seleccione un Producto</option>
+                                    <option *ngFor="let listaProducto of productoslistado" [selected]="forma.value.detallePedidos[i].producto.id === listaProducto.id" [ngValue]="listaProducto">{{listaProducto.nombre}}</option>
+                                </select>
+                                    <small *ngIf="getValidarProducto(i)" class="text-danger">Seleccione un Producto</small>
+                                </td>
+                                <td>{{forma.value.detallePedidos[i].producto.nombre}}</td>
+                                <td>{{forma.value.detallePedidos[i].producto.precio}}</td>
+                                <td>
+                                    <input type="text" class="form-control" formControlName="cantidad" [value]="forma.value.detallePedidos[i].cantidad" placeholder="Cantidad" (blur)="calcularTotal()" required>
+                                    <small *ngIf="getValidarCantidad(i)" class="text-danger">Ingrese un numero</small>
+                                </td>
+                                <td>{{tablaSubtotal(i)}}</td>
+                                <td><button class="btn btn-danger" *ngIf="forma.value.detallePedidos.length!=1" (blur)="calcularTotal()" (click)="borrarProducto(i)">Quitar</button></td>
 
-                <div class="text-right">
-                    <input type="submit" class="btn btn-success" value="Submit" />
+                            </tr>
+
+                        </tbody>
+                        <button class="btn btn-primary" type="button" (click)="addProducto()">Agregar Producto</button>
+                    </table>
+                    <pre>{{forma.valid}}</pre>
+                    <pre>{{forma.value | json}}</pre>
+                </div>
+                <div class="col-md-8 container">
+                    <span>Observaciones</span>
+                    <textarea class="form-control" id="w3review" name="observaciones" [value]="forma.value.observaciones" formControlName="observaciones" rows="4" cols="50"></textarea>
+                    <small *ngIf="observacionesNoValido" class="text-danger">Campo Requerido</small>
+                </div>
+                <div class="col-md-8 container">
+                    <span>Neto: </span>
+                    <span>{{neto}}</span>
+                    <th></th>
+                    <span>Iva: </span>
+                    <span>{{iva}}</span>
+                    <th></th>
+                    <span>Total: </span>
+                    <span>{{totalvalor}}</span>
+                    <th></th>
+                </div>
+                <div class="col-md-8 container">
+                    <button class="btn btn-primary" type="button" (click)="guardar()">Guardar Pedido</button>
+                </div>
+                <div class="col-md-8 container">
+                    <button class="btn btn-primary" type="button" (click)="volver()">Volver</button>
                 </div>
 
             </div>
-        </div>
-
-    </form>
-</div>
-<div>
-    <pre>{{addressForm.value | json}}</pre>
+        </form>
+    </div>
 </div>

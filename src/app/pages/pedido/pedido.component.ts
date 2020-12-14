@@ -6,6 +6,8 @@ import { AuthService } from 'src/app/services/auth.service';
 import { EstadoModel } from '../../models/estado.model';
 import { ClienteModel } from '../../models/cliente.model';
 import { ProductoModel } from '../../models/producto.model';
+import { useAnimation } from '@angular/animations';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-pedido',
@@ -15,10 +17,10 @@ import { ProductoModel } from '../../models/producto.model';
 export class PedidoComponent implements OnInit {
 
   forma: FormGroup;
-  addressForm: FormGroup;
-  addresses: FormArray;
+  detallePedidos: FormArray;
   listado: PedidoModel[] = [];
   formulario = false;
+  editar = false;
   fechaMax = '';
   fechaMin = '';
   buscar = '';
@@ -27,11 +29,14 @@ export class PedidoComponent implements OnInit {
   paginas = 1;
   orden = '';
   neto = 0;
+  iva = 0;
+  totalvalor = 0;
+  subtotal = [];
   pedido: PedidoModel = new PedidoModel();
   estados: EstadoModel[] = [];
   clientes: ClienteModel[] = [];
   datoProducto: ProductoModel[] = [];
-  productos: ProductoModel[] = [];
+  productoslistado: ProductoModel[] = [];
   productoDatos: ProductoModel[] = [];
 
   constructor(
@@ -46,19 +51,41 @@ export class PedidoComponent implements OnInit {
       this.estadoPedido();
       this.productoPedido();
       this.clientePedido();
-      this.otroFormulario();
 
     }
 
   ngOnInit(): void {
   }
 
-  otroFormulario() {
-    this.addressForm = this.fb.group({
-      algo: ['', [Validators.required] ],
-      addresses: this.fb.array([ this.createAddress() ])
+  calcularTotal()
+  {
+    console.log('calcularTotal');
+    this.neto = 0;
+    this.forma.value.detallePedidos.forEach( linea => {
+      if ( !isNaN(linea.producto.precio) && !isNaN(linea.cantidad) ) {
+        console.log(linea.producto.precio);
+        console.log(linea.cantidad);
+        this.neto = this.neto + (linea.producto.precio * linea.cantidad);
+    }
+      console.log(linea.producto.precio);
+      console.log(linea.cantidad);
+      console.log('wow ' + this.neto);
     });
+    this.iva = this.neto * 0.19;
+    this.totalvalor = this.neto + this.iva;
   }
+
+  calcularTotales()
+  {
+    this.neto = 0;
+    this.subtotal.forEach( valor => {
+      this.neto = this.neto + valor;
+      console.log('wow ' + this.neto);
+    });
+    this.iva = this.neto * 0.19;
+    this.totalvalor = this.neto + this.iva;
+  }
+
 
   pagAnterior() {
     // tslint:disable-next-line: prefer-const
@@ -119,7 +146,7 @@ export class PedidoComponent implements OnInit {
     console.log('productoPedido');
     this.auth.getSelector('Productos').subscribe(
       resp => {
-        this.productos = resp;
+        this.productoslistado = resp;
         console.log(resp);
       }
     );
@@ -179,6 +206,13 @@ export class PedidoComponent implements OnInit {
     else { return false; }
   }
 
+  volver() {
+    this.formulario = false;
+    this.editar = false;
+    this.forma.reset();
+    this.listadoPedido();
+  }
+
   ordenBy(ordenPor: string) {
     this.orden = ordenPor;
     this.listadoPedido();
@@ -199,25 +233,25 @@ export class PedidoComponent implements OnInit {
 
   agregarProducto() {
     console.log('hola2');
-    this.productosForm.push( this.fb.control('') );
+    this.detallePedidos.push( this.fb.control('') );
     console.log(this.datoProducto);
   }
 
   borrarProducto(i: number) {
-    this.productosForm.removeAt(i);
-    console.log(i, this.productosForm.value[i]);
+    this.detallePedidos.removeAt(i);
+    console.log(i, this.detallePedidos.value[i]);
   }
 
   selectProducto(id: string, i: number)
   {
-    console.log(this.productosForm.value[i]);
-    this.auth.getDatoId('Productos', this.productosForm.value[i].id).subscribe( resp => {
-      this.productosForm.value[i] = {
+    console.log(this.detallePedidos.value[i]);
+    this.auth.getDatoId('Productos', this.detallePedidos.value[i].id).subscribe( resp => {
+      this.detallePedidos.value[i] = {
         ...resp,
       };
       // this.forma = this.fb.group({
       // });
-      console.log(this.productosForm.value[i]);
+      console.log(this.detallePedidos.value[i]);
     });
     console.log('Aquí viene');
     console.log(id);
@@ -225,24 +259,131 @@ export class PedidoComponent implements OnInit {
     console.log(this.datoProducto);
   }
 
-  updateSubtotal(cant: number, i: number)
-  {
-    console.log('Precio: ' + this.productosForm.value[i].precio);
-    this.productosForm.value[i].subtotal = this.productosForm.value[i].precio * cant;
+  tablaSubtotal(i: number) {
+    // console.log(this.forma.value.productosForm[i].producto.precio);
+    // console.log(this.forma.value.productosForm[i].cantidad);
+    if (this.forma.value.detallePedidos[i].producto.precio === undefined ||
+    this.forma.value.detallePedidos[i].cantidad === '')
+    {
+      this.subtotal[i] = 0;
+      // console.log('true');
+    } else {
+      this.subtotal[i] = this.forma.value.detallePedidos[i].producto.precio * this.forma.value.detallePedidos[i].cantidad;
+      // console.log('false');
+    }
+    if (this.subtotal[i] === isNaN) { this.subtotal[i] = 0; }
+    // console.log('valor es: ' + this.subtotal[i]);
+    return this.subtotal[i];
+  }
+
+  valorNeto() {
+    this.neto = 0;
+    console.log('hola: ' + this.subtotal);
+    this.subtotal.forEach( valor => {
+      this.neto = this.neto + valor;
+      console.log('wow ' + this.neto);
+    });
+    return this.neto;
+  }
+
+  valorIva() {
+    this.iva = this.neto * (19 / 100);
+    return this.iva;
+  }
+
+  valorTotal() {
+    this.totalvalor = this.neto - this.iva;
+    return this.totalvalor;
+  }
+
+  buscarEstado(nombre: string) {
+    let obj = this.estados.filter(e => e.estadoPedido == nombre);
+    return obj;
+  }
+
+  editarPedido(Id: string) {
+    console.log(this.formulario);
+    this.formulario = true;
+    this.editar = true;
+    let cont = 0;
+    this.auth.getDatoId('Pedidos', Id).subscribe( resp => {
+      this.pedido = {
+        ...resp,
+      }
+      
+      console.log(this.pedido);
+
+      /*this.forma.value.cliente = this.pedido.cliente;
+      this.forma.value.estado = this.pedido.estado;
+      this.forma.value.detallePedidos = this.pedido.detallePedidos;
+      this.forma.value.observaciones = this.pedido.observaciones;*/
+      // this.forma.value.detallePedidos[cont].producto.nombre = this.pedido.detallePedidos[cont].producto; 
+      console.log(this.forma.value.detallePedidos);
+
+      
+      
+      this.forma = this.fb.group({
+        cliente: [this.pedido.cliente, [Validators.required] ],
+        estado: [this.pedido.estado],
+        observaciones: [this.pedido.observaciones, [Validators.required, Validators.minLength(3)] ],
+        detallePedidos: this.fb.array([ this.editarProducto(cont)])
+      });
+      cont++;
+      console.log(cont);
+    });
+  }
+
+  editarProducto(i: number): FormGroup {
+    return this.fb.group({
+      producto: [ this.pedido.detallePedidos[i].producto, [Validators.required] ],
+      cantidad: [ this.pedido.detallePedidos[i].cantidad,
+         [Validators.required, Validators.minLength(1), Validators.maxLength(7), Validators.pattern('^[0-9]+$')]]
+    });
+  }
+
+  guardar() {
+
+    if ( this.forma.invalid ) {
+      return Object.values( this.forma.controls ).forEach( control => {
+        if ( control instanceof FormGroup ) {
+          Object.values( control.controls ).forEach( control => control.markAsTouched() );
+        } else {
+          control.markAsTouched();
+        }
+      });
+    } else {
+      console.log(this.forma.value);
+      this.pedido.cliente = this.forma.value.cliente;
+      this.pedido.observaciones = this.forma.value.observaciones;
+      this.pedido.total = this.totalvalor;
+      this.pedido.detallePedidos = this.forma.value.detallePedidos;
+      console.log(this.pedido);
+      if ( this.pedido.id ) {
+        this.pedido.estado = this.forma.value.estado;
+        console.log('Modificando: ' + this.pedido.id);
+        this.auth.putDato('Pedidos', this.pedido).subscribe( resp => {
+          console.log(resp);
+          this.listadoPedido();
+        });
+        this.formulario = false;
+        this.editar = false;
+        this.forma.reset();
+      } else {
+        console.log('Nuevo Pedido');
+        this.pedido.estado = this.estados[0];
+        console.log(this.pedido);
+        this.auth.postDato(this.pedido, 'Pedidos').subscribe( resp => {
+          console.log(resp);
+          this.listadoPedido();
+        });
+        this.formulario = false;
+        this.forma.reset();
+      }
+    }
   }
 
     // ---------------------------------------------------------------------------------
   // ---------------------------------------------------------------------------------
-
-  // tslint:disable-next-line: typedef
-  get productosForm() {
-    return this.forma.get('productosForm') as FormArray;
-  }
-
-  // tslint:disable-next-line: typedef
-  get cantidadForm() {
-    return this.forma.get('cantidadForm') as FormArray;
-  }
 
   // tslint:disable-next-line: typedef
   get clienteNoValido() {
@@ -250,55 +391,55 @@ export class PedidoComponent implements OnInit {
   }
 
   // tslint:disable-next-line: typedef
+  get estadoNoValido() {
+    return this.forma.get('estado').invalid && this.forma.get('estado').touched;
+  }
+
+  // tslint:disable-next-line: typedef
   get observacionesNoValido() {
     return this.forma.get('observaciones').invalid && this.forma.get('observaciones').touched;
   }
 
-  // tslint:disable-next-line: typedef
-  get valorNoValido() {
-    return this.forma.get('productosForm.valor').invalid;
+  get detallePedidosControls() {
+    return this.forma.get('detallePedidos')['controls'];
   }
 
-  // tslint:disable-next-line: typedef
-  get cantidadNoValido() {
-    return this.forma.get('cantidad').invalid && this.forma.get('cantidad').touched;
+  getValidarCantidad(i) {
+
+    return (<FormArray>this.forma.get('detallePedidos')).controls[i].get('cantidad').invalid &&
+    (<FormArray>this.forma.get('detallePedidos')).controls[i].get('cantidad').touched;
+  }
+
+  getValidarProducto(i) {
+
+    return (<FormArray>this.forma.get('detallePedidos')).controls[i].get('producto').invalid &&
+    (<FormArray>this.forma.get('detallePedidos')).controls[i].get('producto').touched;
   }
 
   crearFormulario() {
 
     this.forma = this.fb.group({
       cliente: ['', [Validators.required] ],
-      observaciones: ['', [Validators.required, Validators.minLength(5)] ],
-      cantidad: [''],
-      productosForm: this.fb.array([
-        // this.cantidadForm: this.fb.array([])
+      estado: [''],
+      observaciones: ['', [Validators.required, Validators.minLength(3)] ],
+      detallePedidos: this.fb.array([ this.createProducto()
       ])
     });
-    this.productosForm.push( this.fb.control('') );
+    console.log(this.forma);
   }
 
 
-  // createAddress(): FormGroup {
-  //   return this.fb.group({
-  //     product: '',
-  //     cantidad: ''
-  //   });
-  // }
+  createProducto(): FormGroup {
+    return this.fb.group({
+      producto: ['', [Validators.required] ],
+      cantidad: [ 0, [Validators.required, Validators.minLength(1), Validators.maxLength(7), Validators.pattern('^[0-9]+$')]]
+    });
+  }
 
-  // addAddress(): void {
-  //   this.addresses = this.addressForm.get('addresses') as FormArray;
-  //   this.addresses.push(this.createAddress());
-  // }
-
-  /*nuevoProducto() {
-    let control = <FormArray>this.forma.controls.productosForm;
-    control.push(
-      this.fb.group({
-        cantidad: [''],
-        product: this.fb.array([])
-      })
-    );
-  }*/
+  addProducto(): void {
+    this.detallePedidos = this.forma.get('detallePedidos') as FormArray;
+    this.detallePedidos.push(this.createProducto());
+  }
 
   cargarDataAlFormulario() {
     this.forma.reset({});
@@ -307,29 +448,5 @@ export class PedidoComponent implements OnInit {
 
 // ------------------------------------------------------------
 
-get addressControls() {
-  return this.addressForm.get('addresses')['controls'];
-}
 
-createAddress(): FormGroup {
-  return this.fb.group({
-    address: '',
-    street: '',
-    city: '',
-    country: ''
-  });
-}
-
-addAddress(): void {
-  this.addresses = this.addressForm.get('addresses') as FormArray;
-  this.addresses.push(this.createAddress());
-}
-
-removeAddress(i: number) {
-  this.addresses.removeAt(i);
-}
-
-logValue() {
-  console.log(this.addresses.value);
-}
 }
