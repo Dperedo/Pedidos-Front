@@ -23,6 +23,7 @@ export class ClienteComponent implements OnInit {
   total = 0;
   paginas = 1;
   orden = '';
+  loading: boolean;
   // tslint:disable-next-line: new-parens
   cliente: ClienteModel = new ClienteModel();
 
@@ -80,7 +81,7 @@ export class ClienteComponent implements OnInit {
 
   listadoCliente() {
 
-
+    this.loading = true;
     console.log('listadoCliente');
     this.auth.getDato('Clientes', this.buscar, this.page, this.orden).subscribe(
       resp => {
@@ -93,6 +94,7 @@ export class ClienteComponent implements OnInit {
         console.log(this.listado);
         console.log(this.total);
         console.log(this.paginas);
+        this.loading = false;
       }
     );
   }

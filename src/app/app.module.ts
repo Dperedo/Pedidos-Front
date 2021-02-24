@@ -17,6 +17,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { ClienteComponent } from './pages/cliente/cliente.component';
 import { ProductoComponent } from './pages/producto/producto.component';
 import { PedidoComponent } from './pages/pedido/pedido.component';
+import { LoadingComponent } from './components/shared/loading/loading.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { PedidoComponent } from './pages/pedido/pedido.component';
     ClienteComponent,
     ProductoComponent,
     PedidoComponent,
+    LoadingComponent,
   ],
   imports: [
     BrowserModule,

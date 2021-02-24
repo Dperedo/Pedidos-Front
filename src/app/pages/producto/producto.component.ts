@@ -22,6 +22,7 @@ export class ProductoComponent implements OnInit {
   total = 0;
   paginas = 1;
   orden = '';
+  loading: boolean;
   producto: ProductoModel = new ProductoModel();
 
   constructor(
@@ -74,7 +75,7 @@ export class ProductoComponent implements OnInit {
   }
 
   listadoProducto() {
-
+    this.loading = true;
     console.log('listadoProducto');
     this.auth.getDato('Productos', this.buscar, this.page, this.orden).subscribe(
       resp => {
@@ -82,6 +83,7 @@ export class ProductoComponent implements OnInit {
         this.total = resp['total'];
         this.paginas = resp['numpages'];
         console.log(resp);
+        this.loading = false;
       }
     );
   }

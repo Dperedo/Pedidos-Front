@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { UsuarioModel } from '../models/usuario.model';
-import { map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { ClienteModel } from '../models/cliente.model';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -15,11 +15,15 @@ export class AuthService {
   userToken = '';
   page = '';
   buscar = '';
+  handleError: any;
+  respuesta = true;
   // tslint:disable-next-line: ban-types
   pageInt = 1;
 
   constructor( private http: HttpClient,
-               private router: ActivatedRoute ) { }
+               private router: ActivatedRoute,
+               private ruta: Router
+                ) { }
 
   getQuery( apikey: string ){
     // const url = 'https://localhost:5001/api/Usuarios';
@@ -39,7 +43,7 @@ export class AuthService {
       Authorization: `Bearer ${ this.userToken }`
     });
     console.log('Dentro de getEstado');
-    return this.http.get(`${ this.url }/${ controlador }`).pipe(map((res: any) => res));
+    return this.http.get(`${ this.url }/${ controlador }`, { headers }).pipe(map((res: any) => res));
   }
 
   // ----------------------------------------------------------------------------------------------------------
@@ -61,10 +65,12 @@ export class AuthService {
     console.log('page=' + page, 'buscar=' + buscar, 'orden=' + orden);
     console.log('Dentro de getDatoBuscar');
 
-    return this.http.get(`${ this.url }/${ controlador }/query?texto=${ buscar }&page=${ page }&order=${ orden }`)
+    this.PuedeActivarse();
+
+    return this.http.get(`${ this.url }/${ controlador }/query?texto=${ buscar }&page=${ page }&order=${ orden }`, { headers })
       .pipe(map((res: any) => res ));
   }
-
+  
   getDatoId(controlador: string, ID: string) {
     this.userToken = this.leerToken();
 
@@ -73,6 +79,8 @@ export class AuthService {
     });
     console.log('ID=' + ID);
     console.log('Dentro de getDatoId');
+
+    this.PuedeActivarse();
 
     return this.http.get(`${ this.url }/${ controlador }/${ ID }`).pipe(map((res: any) => res ));
   }
@@ -88,6 +96,9 @@ export class AuthService {
     });
     console.log('Dentro de postDato');
     console.log(Data);
+
+    // this.PuedeActivarse();
+
     return this.http.post(`${ this.url }/${ controlador }`, Data).pipe(map((res: any) => res));
   }
 
@@ -102,6 +113,9 @@ export class AuthService {
     });
     console.log('Dentro de putDato');
     console.log(Data);
+
+    // this.PuedeActivarse();
+
     return this.http.put(`${ this.url }/${ controlador }/${ Data.id }`, Data).pipe(map((res: any) => res));
   }
 
@@ -153,11 +167,20 @@ export class AuthService {
 
   estaAutenticado(): boolean {
     this.leerToken();
-    // console.log('estaAutenticado');
+    console.log('estaAutenticado');
     if ( this.userToken.length < 2 ) {
       return false;
     }
-    // console.log('estaAutenticado2');
+    this.estadoDelToken()
+    //--
+    
+    //--
+    if ( this.respuesta === false ) {
+      console.log('respuesta: '+ this.respuesta);
+      return false;
+    }
+    console.log(this.respuesta);
+    console.log('estaAutenticado2');
     const expira = Number(localStorage.getItem('expira'));
 
     // console.log('Expira: ' + expira);
@@ -173,20 +196,53 @@ export class AuthService {
     // return this.userToken.length > 2;
   }
 
+  estadoDelToken() {
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${ this.userToken }`
+    });
+    console.log('123');
+    this.http.get(`${ this.url }/usuarios`, { headers, observe: 'response' })
+    .subscribe(response => {
+      console.log('suscrito');
+      console.log(response.status);
+      // if ( !(response.status >= 200 || response.status <= 299) ){
+      //   console.log(response.status + 'hola');
+      //   this.respuesta = false;
+      // }
+    },
+    err => {
+      console.log('HTTP Error', err.status);
+      this.ruta.navigateByUrl('/login');
+      this.logout();
+    });
+    console.log('fuera del suscrito ' + this.respuesta);
+    
+  }
+
+  PuedeActivarse(): boolean {
+    if ( this.estaAutenticado() ) {
+      console.log('ok');
+      return true;
+    } else {
+      console.log('no ok');
+      this.ruta.navigateByUrl('/login');
+      this.logout();
+      return false;
+    }
+  }
+
 }
 
 
 
 /*
 
-take = cuantos registros por página
-page = la pagina que quiero ver
-
----
-backend:
-if take == null o invalido entonces take = 10
-if page es inválido entonces = 1
-
-skip = (page - 1) * take
+- cambiar el login-
+- modificar el diseño de las paginas-
+- agregar las animaciones-
+- agregar las autencicaciones en los botones-
+- cambiar la fecha de la expiracion del token en el backend-
+agregar una configuracion para el token
+- crear una funcion para poder modificar la expiracion del token a nivel usuario
 
 */

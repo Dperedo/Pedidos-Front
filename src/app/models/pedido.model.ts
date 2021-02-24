@@ -7,7 +7,7 @@ export class PedidoModel {
     cliente: ClienteModel;
     estado: EstadoModel;
     total: number;
-    detallePedidos: DetallePedidoModel;
+    detallePedidos: DetallePedidoModel[];
     fechaDeCreacion: string;
     observaciones: string;
 }

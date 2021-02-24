@@ -16,6 +16,7 @@ import { Observable } from 'rxjs';
 })
 export class PedidoComponent implements OnInit {
 
+  listaDetalle: any[] = [];
   forma: FormGroup;
   detallePedidos: FormArray;
   listado: PedidoModel[] = [];
@@ -59,6 +60,7 @@ export class PedidoComponent implements OnInit {
 
   calcularTotal()
   {
+    // this.extraerProducto(i);
     console.log('calcularTotal');
     this.neto = 0;
     this.forma.value.detallePedidos.forEach( linea => {
@@ -85,7 +87,28 @@ export class PedidoComponent implements OnInit {
     this.iva = this.neto * 0.19;
     this.totalvalor = this.neto + this.iva;
   }
+  
+  extraerProducto(i: number) {
+    if (typeof this.forma.value.detallePedidos[i].producto === 'string') {
+      console.log('hola');
+    
+      this.auth.getDatoId('Productos', this.forma.value.detallePedidos[i].producto).subscribe( resp => {
+        this.forma.value.detallePedidos[i].producto = {
+          ...resp,
+        };
+        console.log(this.forma.value.detallePedidos[i].producto);
+      });
+    }
+  }
 
+  otraFuncion(i: number) {
+    this.auth.getDatoId('Productos', this.forma.value.detallePedidos[i].producto).subscribe( resp => {
+      this.forma.value.detallePedidos[i].producto = {
+        ...resp,
+      };
+      console.log(this.forma.value.detallePedidos[i].producto);
+    });
+  }
 
   pagAnterior() {
     // tslint:disable-next-line: prefer-const
@@ -211,6 +234,12 @@ export class PedidoComponent implements OnInit {
     this.editar = false;
     this.forma.reset();
     this.listadoPedido();
+    /*let eliminar = this.detallePedidos.length;
+    for (let i = 0; i < eliminar; i++) {
+      this.borrarProducto(0);
+    }*/
+    this.crearFormulario();
+    console.log(this.forma.value);
   }
 
   ordenBy(ordenPor: string) {
@@ -301,6 +330,13 @@ export class PedidoComponent implements OnInit {
     return obj;
   }
 
+  seleccionarProducto(productoSelect: ProductoModel, i: number) {
+
+    console.log('producto seleccionado: ' + productoSelect);
+
+    this.forma.value.detallePedidos[i].producto = productoSelect;
+  }
+
   editarPedido(Id: string) {
     console.log(this.formulario);
     this.formulario = true;
@@ -313,31 +349,60 @@ export class PedidoComponent implements OnInit {
       
       console.log(this.pedido);
 
-      /*this.forma.value.cliente = this.pedido.cliente;
-      this.forma.value.estado = this.pedido.estado;
       this.forma.value.detallePedidos = this.pedido.detallePedidos;
-      this.forma.value.observaciones = this.pedido.observaciones;*/
-      // this.forma.value.detallePedidos[cont].producto.nombre = this.pedido.detallePedidos[cont].producto; 
       console.log(this.forma.value.detallePedidos);
 
-      
-      
       this.forma = this.fb.group({
         cliente: [this.pedido.cliente, [Validators.required] ],
         estado: [this.pedido.estado],
         observaciones: [this.pedido.observaciones, [Validators.required, Validators.minLength(3)] ],
-        detallePedidos: this.fb.array([ this.editarProducto(cont)])
+        detallePedidos: this.fb.array([  ])
       });
-      cont++;
-      console.log(cont);
+      this.forma.value.detallePedidos = this.pedido.detallePedidos;
+
+      this.detallePedidos = this.forma.get('detallePedidos') as FormArray;
+
+      for (let i = 0; i < this.pedido.detallePedidos.length; i++) {
+        
+        this.detallePedidos.push(this.agregarEditarDetalle(this.pedido.detallePedidos[i]));
+        console.log( this.forma.value.detallePedidos[i].producto);
+      }
+
+      console.log(this.forma.value.detallePedidos);
+      this.calcularTotal();
+
     });
   }
 
-  editarProducto(i: number): FormGroup {
+  agregarEditarDetalle(detalle: any): FormGroup {
+    // console.log('agregarEditarDetalle: ' + this.pedido.detallePedidos[i].producto);
+    console.log('cliente: ' + this.pedido.cliente);
+    return this.fb.group({
+      producto: [detalle.producto, [Validators.required] ],
+      cantidad: [detalle.cantidad, [Validators.required, Validators.minLength(1), Validators.maxLength(7),Validators.min(1) , Validators.pattern('^[0-9]+$')]]
+    });
+  }
+
+  editarProducto(i: number) {
+
     return this.fb.group({
       producto: [ this.pedido.detallePedidos[i].producto, [Validators.required] ],
-      cantidad: [ this.pedido.detallePedidos[i].cantidad,
-         [Validators.required, Validators.minLength(1), Validators.maxLength(7), Validators.pattern('^[0-9]+$')]]
+      cantidad: [ this.pedido.detallePedidos[i].cantidad, [Validators.required, Validators.minLength(1), Validators.maxLength(7),Validators.min(1) , Validators.pattern('^[0-9]+$')]]
+    });
+  }
+
+  cargarDetallePedidos(): any {
+
+     
+     this.forma.value.detallePedidos.forEach( detalle => { 
+      console.log('detalle: ' + detalle.producto); 
+
+        this.listaDetalle.push(this.fb.group({
+          producto: [ detalle.producto, [Validators.required] ],
+          cantidad: [ detalle.cantidad,
+             [Validators.required, Validators.minLength(1), Validators.maxLength(7), Validators.pattern('^[0-9]+$')]]
+          }));
+       
     });
   }
 
@@ -425,14 +490,14 @@ export class PedidoComponent implements OnInit {
       detallePedidos: this.fb.array([ this.createProducto()
       ])
     });
-    console.log(this.forma);
+    console.log(this.forma.value);
   }
 
 
   createProducto(): FormGroup {
     return this.fb.group({
       producto: ['', [Validators.required] ],
-      cantidad: [ 0, [Validators.required, Validators.minLength(1), Validators.maxLength(7), Validators.pattern('^[0-9]+$')]]
+      cantidad: [ 0, [Validators.required, Validators.minLength(1), Validators.maxLength(7),Validators.min(1) , Validators.pattern('^[0-9]+$')]]
     });
   }
 

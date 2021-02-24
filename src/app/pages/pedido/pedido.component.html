@@ -1,7 +1,7 @@
 <app-navbar></app-navbar>
 <div *ngIf="!formulario">
     <div class="row">
-        <div class="col-md-5 container">
+        <div class="col-md-3 offset-md-4 mt-5">
             <h1>Lista Pedidos</h1>
         </div>
     </div>
@@ -15,7 +15,7 @@
             <input [(ngModel)]="buscar" name="buscar" (keyup.enter)="getBuscar()" type="text" class="form-control" placeholder="Buscar un dato">
             <span>estado</span>
             <select class="form-control" name="estadoBuscar">
-            <option value="" selected>Seleccione un Estado</option>
+            <option value="" disabled selected>Seleccione un Estado</option>
             <option *ngFor="let estado of estados">{{estado.estadoPedido}}</option>
         </select>
             <button class="btn btn-primary" type="submit" (click)="getBuscar()">Buscar</button>
@@ -50,7 +50,7 @@
                         <td><button class="btn btn-primary" (click)="editarPedido(listados.id)">{{listados.secuencial}}</button></td>
                         <td>{{listados.fechaDeCreacion | date:'dd/MM/yyyy'}}</td>
                         <td>{{listados.cliente.razonSocial}}</td>
-                        <td>{{listados.detallePedidos[0].producto.nombre}}</td>
+                        <td>{{listados.total}}</td>
                         <td>{{listados.estado.estadoPedido}}</td>
                         <td>
                             <button class="btn btn-primary">cerrar</button>
@@ -90,7 +90,7 @@
 </div>
 <div *ngIf="formulario">
     <div>
-        <form [formGroup]="forma">
+        <form [formGroup]="forma" (ngSubmit)="guardar()">
             <div class="row">
                 <div class="col-md-5 container">
                     <h1>Pedido</h1>
@@ -100,7 +100,7 @@
                 <div class="col-md-3 container">
                     <span>Cliente</span>
                     <select class="form-control" name="cliente" formControlName="cliente">
-                    <option value="" selected>Seleccione un Cliente</option>
+                    <option [ngValue]="null" disabled selected>Seleccione un Cliente</option>
                     <option *ngFor="let cliente of clientes" [selected]="forma.value.cliente.id === cliente.id" [ngValue]="cliente">{{cliente.razonSocial}}</option>
                     </select>
                     <small *ngIf="clienteNoValido" class="text-danger">Seleccione Cliente</small>
@@ -119,7 +119,8 @@
                     <table class="table">
                         <thead class="thead-dark">
                             <tr>
-                                <th></th>
+                                <th>N°</th>
+
                                 <th>Producto</th>
                                 <th>Nombre Producto</th>
                                 <th>Valor</th>
@@ -133,17 +134,28 @@
                             <tr [formGroupName]="i">
 
                                 <td>{{i+1}}</td>
+
                                 <td>
                                     <select class="form-control" name="productoSelect" formControlName="producto" (blur)="calcularTotal()">
-                                    <option value="" selected>Seleccione un Producto</option>
-                                    <option *ngFor="let listaProducto of productoslistado" [selected]="forma.value.detallePedidos[i].producto.id === listaProducto.id" [ngValue]="listaProducto">{{listaProducto.nombre}}</option>
-                                </select>
+                                    <option value="">Seleccione un Producto</option>
+                                    <option *ngFor="let produ of productoslistado; let p = index"
+                                    [selected]="forma.value.detallePedidos[i].producto.id === produ.id" value="{{productoslistado[p].id}}" >{{produ.nombre}}</option>
+                                    </select>
                                     <small *ngIf="getValidarProducto(i)" class="text-danger">Seleccione un Producto</small>
                                 </td>
-                                <td>{{forma.value.detallePedidos[i].producto.nombre}}</td>
+                                <td>
+                                    <!--
+                                    <select *ngIf="forma.value.detallePedidos[i].producto.id" class="form-control" name="productoSelect" formControlName="producto" (blur)="calcularTotal()">
+                                        <option value="" >Seleccione un Producto</option>
+                                        <option *ngFor="let produ of productoslistado"
+                                         [selected]="forma.value.detallePedidos[i].producto.id === produ.id" value="{{produ.id}}">{{produ.nombre}}</option>
+                                    </select>
+                                    <small *ngIf="getValidarProducto(i)" class="text-danger">Seleccione un Producto</small> -->
+                                    {{forma.value.detallePedidos[i].producto.nombre}}
+                                </td>
                                 <td>{{forma.value.detallePedidos[i].producto.precio}}</td>
                                 <td>
-                                    <input type="text" class="form-control" formControlName="cantidad" [value]="forma.value.detallePedidos[i].cantidad" placeholder="Cantidad" (blur)="calcularTotal()" required>
+                                    <input *ngIf="forma.value.detallePedidos[i].producto.id" type="text" class="form-control" formControlName="cantidad" [value]="forma.value.detallePedidos[i].cantidad" placeholder="Cantidad" (blur)="calcularTotal()" required>
                                     <small *ngIf="getValidarCantidad(i)" class="text-danger">Ingrese un numero</small>
                                 </td>
                                 <td>{{tablaSubtotal(i)}}</td>
@@ -152,7 +164,7 @@
                             </tr>
 
                         </tbody>
-                        <button class="btn btn-primary" type="button" (click)="addProducto()">Agregar Producto</button>
+                        <button class="btn btn-primary" type="button" (click)="addProducto()" (click)="calcularTotal()">Agregar Producto</button>
                     </table>
                     <pre>{{forma.valid}}</pre>
                     <pre>{{forma.value | json}}</pre>
