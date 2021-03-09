@@ -6,8 +6,7 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
-  styles: [
-  ]
+  styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent implements OnInit {
 
@@ -20,10 +19,10 @@ export class NavbarComponent implements OnInit {
     Swal.fire({
       type: 'question',
       confirmButtonText: 'Confirmar',
-      cancelButtonText: 'cancelar',
+      cancelButtonText: 'Cancelar',
       showConfirmButton: true,
       showCancelButton: true,
-      html: 'Seguro que quiere cerrar sesión'
+      html: 'Seguro que quiere cerrar sesión?'
     }).then((result) => {
     if ( result.value ) {
       this.auth.logout();

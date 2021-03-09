@@ -1,156 +1,158 @@
 <app-navbar></app-navbar>
 
-<div *ngIf="!formulario">
-    <div class="row">
-        <div class="col-md-3 offset-md-4 mt-5 animated2 fadeInRight">
-            <h1>Lista Productos</h1>
-        </div>
-    </div>
-    <tr></tr>
-    <div class="row">
-        <div class="col-md-2 offset-md-2 mt-5">
-            <input [(ngModel)]="buscar" name="buscar" (keyup.enter)="getBuscar()" type="text" class="form-control" placeholder="Buscar un dato">
-            <div class="mt-3">
-                <button class="btn btn-primary" type="submit" (click)="getBuscar()">Buscar</button>
-            </div>
-        </div>
-
-
-        <div class="col-md-3 offset-md-4 mt-5">
-            <button class="btn btn-primary" (click)="agregarProducto()">Agregar Producto</button>
-        </div>
-    </div>
-    <tr></tr>
-    <tr></tr>
-    <div class="row">
-        <div class="col-md-7 offset-md-2 mt-3">
-
-            <table class="table">
-                <thead class="thead-dark">
-                    <tr>
-                        <th>+</th>
-                        <th>
-                            <button class="btn" *ngIf="orden!='CodigoAcending'" (click)="ordenBy('CodigoAcending')">Código</button>
-                            <button class="btn" *ngIf="orden=='CodigoAcending'" (click)="ordenBy('CodigoDescending')">Código</button>
-                            <mat-icon *ngIf="orden=='CodigoDescending'">keyboard_arrow_down</mat-icon>
-                            <mat-icon *ngIf="orden=='CodigoAcending'">keyboard_arrow_up</mat-icon>
-                        </th>
-                        <th>
-                            <button class="btn" *ngIf="orden!='NombreAcending'" (click)="ordenBy('NombreAcending')">Nombre</button>
-                            <button class="btn" *ngIf="orden=='NombreAcending'" (click)="ordenBy('NombreDescending')">Nombre</button>
-                            <mat-icon *ngIf="orden=='NombreDescending'">keyboard_arrow_down</mat-icon>
-                            <mat-icon *ngIf="orden=='NombreAcending'">keyboard_arrow_up</mat-icon>
-                        </th>
-                        <th>
-                            <button class="btn" *ngIf="orden!='PrecioAcending'" (click)="ordenBy('PrecioAcending')">Valor</button>
-                            <button class="btn" *ngIf="orden=='PrecioAcending'" (click)="ordenBy('PrecioDescending')">Valor</button>
-                            <mat-icon *ngIf="orden=='PrecioDescending'">keyboard_arrow_down</mat-icon>
-                            <mat-icon *ngIf="orden=='PrecioAcending'">keyboard_arrow_up</mat-icon>
-                        </th>
-                        <th>
-                            <button class="btn" *ngIf="orden!='VigenteAcending'" (click)="ordenBy('VigenteAcending')">Vigente</button>
-                            <button class="btn" *ngIf="orden=='VigenteAcending'" (click)="ordenBy('VigenteDescending')">Vigente</button>
-                            <mat-icon *ngIf="orden=='VigenteDescending'">keyboard_arrow_down</mat-icon>
-                            <mat-icon *ngIf="orden=='VigenteAcending'">keyboard_arrow_up</mat-icon>
-                        </th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody *ngIf="total">
-                    <tr *ngFor="let listados of listado; let i = index">
-                        <td>
-                            <button class="btn btn-primary" (click)="editarProducto(listado[i].id)"><mat-icon>edit</mat-icon></button>
-                        </td>
-                        <td>{{listados.codigo}}</td>
-                        <td>{{listados.nombre}}</td>
-                        <td>{{listados.precio}}</td>
-                        <td>{{vigenteProducto(listados.vigente)}}</td>
-                        <td>
-                            <button class="btn btn-danger" *ngIf="listados.vigente" (click)="editarVigente(listado[i].id,i)">Desactivar</button>
-                            <button class="btn btn-primary" *ngIf="!listados.vigente" (click)="editarVigente(listado[i].id,i)">Activar</button>
-                        </td>
-                    </tr>
-                </tbody>
-                <p *ngIf="!total">No hay Productos!</p>
-            </table>
-            <app-loading *ngIf="loading"></app-loading>
-
-        </div>
-    </div>
-    <div class="col-md-2 offset-md-5 mt-5">
+<body>
+    <div *ngIf="!formulario">
         <div class="row">
-            <ul class="pagination justify-content-center">
-                <li class="page-item disabled" *ngIf="inicioDePaginas()">
-                    <a class="page-link">Anterior</a>
-                </li>
-                <li class="page-item" *ngIf="!inicioDePaginas()">
-                    <a class="page-link" (click)="pagAnterior()">Anterior</a>
-                </li>
+            <div class="col-md-2 offset-md-4 mt-5 animated2 fadeInRight" id="head">
+                <h1>Lista Productos</h1>
+            </div>
+        </div>
+        <tr></tr>
+        <div class="row">
+            <div class="col-md-2 offset-md-2 mt-5">
+                <input [(ngModel)]="buscar" name="buscar" (keyup.enter)="getBuscar()" type="text" class="form-control" placeholder="Buscar un dato">
+                <div class="mt-3">
+                    <button class="btn btn-primary" type="submit" (click)="getBuscar()">Buscar</button>
+                </div>
+            </div>
 
-                <li *ngFor="let pag of arreglo(paginas); let i = index" class="page-item">
-                    <a class="page-link" (click)="getPage(i+1)">{{i+1}}</a>
-                </li>
 
-                <li class="page-item disabled" *ngIf="finalDePaginas()">
-                    <a class="page-link">Siguiente</a>
-                </li>
-                <li class="page-item" *ngIf="!finalDePaginas()">
-                    <a class="page-link" (click)="pagSiguiente()">Siguiente</a>
-                </li>
-            </ul>
+            <div class="col-md-3 offset-md-4 mt-5">
+                <button class="btn btn-primary" (click)="agregarProducto()">Agregar Producto</button>
+            </div>
+        </div>
+        <tr></tr>
+        <tr></tr>
+        <div class="row">
+            <div class="col-md-7 offset-md-2 mt-3" id="formContent">
+
+                <table class="table">
+                    <thead id="formHead">
+                        <tr>
+                            <th>+</th>
+                            <th>
+                                <button class="btn" *ngIf="orden!='CodigoAcending'" (click)="ordenBy('CodigoAcending')">Código</button>
+                                <button class="btn" *ngIf="orden=='CodigoAcending'" (click)="ordenBy('CodigoDescending')">Código</button>
+                                <mat-icon *ngIf="orden=='CodigoDescending'">keyboard_arrow_down</mat-icon>
+                                <mat-icon *ngIf="orden=='CodigoAcending'">keyboard_arrow_up</mat-icon>
+                            </th>
+                            <th>
+                                <button class="btn" *ngIf="orden!='NombreAcending'" (click)="ordenBy('NombreAcending')">Nombre</button>
+                                <button class="btn" *ngIf="orden=='NombreAcending'" (click)="ordenBy('NombreDescending')">Nombre</button>
+                                <mat-icon *ngIf="orden=='NombreDescending'">keyboard_arrow_down</mat-icon>
+                                <mat-icon *ngIf="orden=='NombreAcending'">keyboard_arrow_up</mat-icon>
+                            </th>
+                            <th>
+                                <button class="btn" *ngIf="orden!='PrecioAcending'" (click)="ordenBy('PrecioAcending')">Valor</button>
+                                <button class="btn" *ngIf="orden=='PrecioAcending'" (click)="ordenBy('PrecioDescending')">Valor</button>
+                                <mat-icon *ngIf="orden=='PrecioDescending'">keyboard_arrow_down</mat-icon>
+                                <mat-icon *ngIf="orden=='PrecioAcending'">keyboard_arrow_up</mat-icon>
+                            </th>
+                            <th>
+                                <button class="btn" *ngIf="orden!='VigenteAcending'" (click)="ordenBy('VigenteAcending')">Vigente</button>
+                                <button class="btn" *ngIf="orden=='VigenteAcending'" (click)="ordenBy('VigenteDescending')">Vigente</button>
+                                <mat-icon *ngIf="orden=='VigenteDescending'">keyboard_arrow_down</mat-icon>
+                                <mat-icon *ngIf="orden=='VigenteAcending'">keyboard_arrow_up</mat-icon>
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody *ngIf="total">
+                        <tr *ngFor="let listados of listado; let i = index">
+                            <td>
+                                <button class="btn btn-primary" (click)="editarProducto(listado[i].id)"><mat-icon>edit</mat-icon></button>
+                            </td>
+                            <td>{{listados.codigo}}</td>
+                            <td>{{listados.nombre}}</td>
+                            <td>{{listados.precio}}</td>
+                            <td>{{vigenteProducto(listados.vigente)}}</td>
+                            <td>
+                                <button class="btn btn-danger" *ngIf="listados.vigente" (click)="editarVigente(listado[i].id,i)">Desactivar</button>
+                                <button class="btn btn-primary" *ngIf="!listados.vigente" (click)="editarVigente(listado[i].id,i)">Activar</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <p *ngIf="!total">No hay Productos!</p>
+                </table>
+                <app-loading *ngIf="loading"></app-loading>
+
+            </div>
+        </div>
+        <div class="col-md-2 offset-md-5 mt-5">
+            <div class="row">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled" *ngIf="inicioDePaginas()">
+                        <a class="page-link">Anterior</a>
+                    </li>
+                    <li class="page-item" *ngIf="!inicioDePaginas()">
+                        <a class="page-link" (click)="pagAnterior()">Anterior</a>
+                    </li>
+
+                    <li *ngFor="let pag of arreglo(paginas); let i = index" class="page-item">
+                        <a class="page-link" (click)="getPage(i+1)">{{i+1}}</a>
+                    </li>
+
+                    <li class="page-item disabled" *ngIf="finalDePaginas()">
+                        <a class="page-link">Siguiente</a>
+                    </li>
+                    <li class="page-item" *ngIf="!finalDePaginas()">
+                        <a class="page-link" (click)="pagSiguiente()">Siguiente</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
-</div>
-<th></th>
+    <th></th>
 
-<div *ngIf="formulario">
-    <div class="row">
-        <div class="col-md-3 offset-md-4 mt-5 animated2 fadeInDown">
-            <h1>Producto</h1>
+    <div *ngIf="formulario">
+        <div class="row">
+            <div class="col-md-3 offset-md-4 mt-5 animated2 fadeInDown">
+                <h1>Producto</h1>
+            </div>
         </div>
-    </div>
-    <tr></tr>
-    <tr></tr>
-    <form autocomplete="off" [formGroup]="forma" (ngSubmit)="guardar()" class="container">
-        <div class="col-md-7 offset-md-1 mt-5 animated2 fadeInUp">
-            <div class="form-group row">
-                <label class="col-2 col-form-label">Codigo</label>
-                <div class="col-8">
-                    <input class="form-control" type="text" placeholder="codigo" formControlName="codigo" [class.is-invalid]="codigoNoValido">
-                    <small *ngIf="codigoNoValido" class="text-danger">Ingrese Codigo</small>
-                </div>
-            </div>
-            <div class="form-group row">
-                <label class="col-2 col-form-label">Nombre</label>
-                <div class="col-8">
-                    <input class="form-control" type="text" placeholder="nombre" formControlName="nombre" [class.is-invalid]="nombreNoValido">
-                    <small *ngIf="nombreNoValido" class="text-danger">Ingrese Nombre</small>
-                </div>
-            </div>
-            <div class="form-group row">
-                <label class="col-2 col-form-label">Valor</label>
-                <div class="col-8">
-                    <input class="form-control" type="text" placeholder="precio" formControlName="precio" [class.is-invalid]="precioNoValido">
-                    <small *ngIf="precioNoValido" class="text-danger">Ingrese Valor</small>
-                </div>
-            </div>
-            <div class="form-group row">
-                <label class="col-2 col-form-label">Vigente</label>
-                <div class="col-8">
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" name="vigente" value="1" formControlName="vigente" [class.is-invalid]="vigenteNoValido">
+        <tr></tr>
+        <tr></tr>
+        <form autocomplete="off" [formGroup]="forma" (ngSubmit)="guardar()" class="container">
+            <div class="col-md-7 offset-md-1 mt-5 animated2 fadeInUp">
+                <div class="form-group row">
+                    <label class="col-2 col-form-label">Codigo</label>
+                    <div class="col-8">
+                        <input class="form-control" type="text" placeholder="codigo" formControlName="codigo" [class.is-invalid]="codigoNoValido">
+                        <small *ngIf="codigoNoValido" class="text-danger">Ingrese Codigo</small>
                     </div>
                 </div>
-            </div>
-            <div class="form-group row">
-                <div class="col-3">
-                    <button class="btn btn-primary" type="button" (click)="guardar()">Guardar</button>
+                <div class="form-group row">
+                    <label class="col-2 col-form-label">Nombre</label>
+                    <div class="col-8">
+                        <input class="form-control" type="text" placeholder="nombre" formControlName="nombre" [class.is-invalid]="nombreNoValido">
+                        <small *ngIf="nombreNoValido" class="text-danger">Ingrese Nombre</small>
+                    </div>
                 </div>
-                <div class="col-1">
-                    <button class="btn btn-primary" type="button" (click)="volver()">Volver</button>
+                <div class="form-group row">
+                    <label class="col-2 col-form-label">Valor</label>
+                    <div class="col-8">
+                        <input class="form-control" type="text" placeholder="precio" formControlName="precio" [class.is-invalid]="precioNoValido">
+                        <small *ngIf="precioNoValido" class="text-danger">Ingrese Valor</small>
+                    </div>
                 </div>
-            </div>
+                <div class="form-group row">
+                    <label class="col-2 col-form-label">Vigente</label>
+                    <div class="col-8">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="vigente" value="1" formControlName="vigente" [class.is-invalid]="vigenteNoValido">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-3">
+                        <button class="btn btn-primary" type="button" (click)="guardar()">Guardar</button>
+                    </div>
+                    <div class="col-1">
+                        <button class="btn btn-primary" type="button" (click)="volver()">Volver</button>
+                    </div>
+                </div>
 
-        </div>
-    </form>
-</div>
+            </div>
+        </form>
+    </div>
+</body>

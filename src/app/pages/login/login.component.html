@@ -1,41 +1,44 @@
-<div class="col-md-3 offset-md-4 mt-5">
-    <div class="card wrapper" id="formContent">
-        <form (ngSubmit)="login( f )" #f="ngForm">
-            <div class="alert alert-primary animated fadeInLeft">
-                <h4 class="card-header">Login</h4>
-            </div>
-            <div class="card-body animated fadeInRight">
-                <div class="form-group">
-                    <label for="username">Correo</label>
-                    <div>
-                        <input class="form-control" id="login" type="text" name="email" [(ngModel)]="usuario.username" required email placeholder="email">
-                    </div>
-
-                    <span *ngIf="f.submitted && f.controls['email'].errors" class="text-danger animated fadeIn">El correo es obligatorio</span>
-
-                    <label for="password">Contraseña</label>
-                    <div data-validate="Password is required">
-                        <input class="form-control" id="password" type="password" name="password" [(ngModel)]="usuario.password" minlength="1" required placeholder="Password">
-                    </div>
-                    <span *ngIf="f.submitted && f.controls['password'].errors" class="text-danger animated fadeIn">La contraseña es obligatoria</span>
+<body>
+    <a></a>
+    <div class="col-md-3 offset-md-4 mt-5">
+        <div class="card wrapper" id="formContent">
+            <form (ngSubmit)="login( f )" #f="ngForm">
+                <div class="alert alert-primary animated fadeInLeft">
+                    <h4 class="card-header">Login</h4>
                 </div>
+                <div class="card-body animated fadeInRight">
+                    <div class="form-group">
+                        <label for="username">Correo</label>
+                        <div>
+                            <input class="form-control" id="login" type="text" name="email" [(ngModel)]="usuario.username" required email placeholder="email">
+                        </div>
 
-                <div>
-                    <div class="checkbox">
-                        <input [(ngModel)]="recordarme" class="input-checkbox100" id="ckb1" type="checkbox" name="remember-me">
+                        <span *ngIf="f.submitted && f.controls['email'].errors" class="text-danger animated fadeIn">El correo es obligatorio</span>
+
+                        <label for="password">Contraseña</label>
+                        <div data-validate="Password is required">
+                            <input class="form-control" id="password" type="password" name="password" [(ngModel)]="usuario.password" minlength="1" required placeholder="Password">
+                        </div>
+                        <span *ngIf="f.submitted && f.controls['password'].errors" class="text-danger animated fadeIn">La contraseña es obligatoria</span>
                     </div>
-                    <label class="label-checkbox100" for="ckb1">
+
+                    <div>
+                        <div class="checkbox">
+                            <input [(ngModel)]="recordarme" class="input-checkbox100" id="ckb1" type="checkbox" name="remember-me">
+                        </div>
+                        <label class="label-checkbox100" for="ckb1">
                         Recordar mi usuario
                     </label>
-                </div>
+                    </div>
 
-                <div class="mt-3">
-                    <button type="submit" routerLink="/home">
+                    <div class="mt-3">
+                        <button type="submit" routerLink="/home">
                         Ingresar
                     </button>
-                </div>
+                    </div>
 
-            </div>
-        </form>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
+</body>
