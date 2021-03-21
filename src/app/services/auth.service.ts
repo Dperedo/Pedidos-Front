@@ -5,12 +5,17 @@ import { catchError, map } from 'rxjs/operators';
 import { ClienteModel } from '../models/cliente.model';
 import { ActivatedRoute, Router } from '@angular/router';
 
+import configuracion from '../../../tsconfig.json';
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private url = 'https://localhost:5001/api';
+  // private url = 'https://localhost:5001/api';
+  private url = 'https://app-pedidos.azurewebsites.net/backapp/api';
+  // private url = configuracion['url'];
+  // console.log(configuracion);
 
   userToken = '';
   page = '';
