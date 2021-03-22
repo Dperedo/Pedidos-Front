@@ -1,0 +1,198 @@
+<app-navbar></app-navbar>
+<div *ngIf="!formulario">
+    <div class="row">
+        <div class="col-md-3 offset-md-4 mt-5">
+            <h1>Lista Pedidos</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 container">
+            <span>Fecha Pedido</span>
+            <input [(ngModel)]="fechaMin" name="fecha" type="text" class="form-control" placeholder="Fecha Min.">
+            <input [(ngModel)]="fechaMax" name="fecha" type="text" class="form-control" placeholder="Fecha Max.">
+
+            <span>buscar</span>
+            <input [(ngModel)]="buscar" name="buscar" (keyup.enter)="getBuscar()" type="text" class="form-control" placeholder="Buscar un dato">
+            <span>estado</span>
+            <select class="form-control" name="estadoBuscar">
+            <option value="" disabled selected>Seleccione un Estado</option>
+            <option *ngFor="let estado of estados">{{estado.estadoPedido}}</option>
+        </select>
+            <button class="btn btn-primary" type="submit" (click)="getBuscar()">Buscar</button>
+        </div>
+        <div class="col-md-2 container">
+            <button class="btn btn-primary" (click)="agregarPedido()">Agregar Pedido</button>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-md-8 container">
+
+            <table class="table">
+
+                <thead class="thead-dark">
+                    <tr>
+
+                        <th>N° Pedido</th>
+                        <th>Fecha Pedido
+                        </th>
+                        <th>Cliente
+                        </th>
+                        <th>Total
+                        </th>
+                        <th>Estado
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let listados of listado; let i = index">
+                        <td><button class="btn btn-primary" (click)="editarPedido(listados.id)">{{listados.secuencial}}</button></td>
+                        <td>{{listados.fechaDeCreacion | date:'dd/MM/yyyy'}}</td>
+                        <td>{{listados.cliente.razonSocial}}</td>
+                        <td>{{listados.total}}</td>
+                        <td>{{listados.estado.estadoPedido}}</td>
+                        <td>
+                            <button class="btn btn-primary">cerrar</button>
+                            <button class="btn btn-danger">eliminar</button>
+                        </td>
+                    </tr>
+                    <p *ngIf="!total">No hay Pedidos!</p>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="col-md-1 container">
+        <div class="row">
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled" *ngIf="inicioDePaginas()">
+                    <a class="page-link">Anterior</a>
+                </li>
+                <li class="page-item" *ngIf="!inicioDePaginas()">
+                    <a class="page-link" (click)="pagAnterior()">Anterior</a>
+                </li>
+
+                <li *ngFor="let pag of arreglo(paginas); let i = index" class="page-item">
+                    <a class="page-link" (click)="getPage(i+1)">{{i+1}}</a>
+                </li>
+
+                <li class="page-item disabled" *ngIf="finalDePaginas()">
+                    <a class="page-link">Siguiente</a>
+                </li>
+                <li class="page-item" *ngIf="!finalDePaginas()">
+                    <a class="page-link" (click)="pagSiguiente()">Siguiente</a>
+                </li>
+            </ul>
+            <hr/>
+        </div>
+    </div>
+</div>
+<div *ngIf="formulario">
+    <div>
+        <form [formGroup]="forma" (ngSubmit)="guardar()">
+            <div class="row">
+                <div class="col-md-5 container">
+                    <h1>Pedido</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-3 container">
+                    <span>Cliente</span>
+                    <select class="form-control" name="cliente" formControlName="cliente">
+                    <option [ngValue]="null" disabled selected>Seleccione un Cliente</option>
+                    <option *ngFor="let cliente of clientes" [selected]="forma.value.cliente.id === cliente.id" [ngValue]="cliente">{{cliente.razonSocial}}</option>
+                    </select>
+                    <small *ngIf="clienteNoValido" class="text-danger">Seleccione Cliente</small>
+                </div>
+                <div class="col-md-3 container" *ngIf="editar">
+                    <span>Estado</span>
+                    <select class="form-control" name="estado" formControlName="estado">
+                    <option *ngFor="let estado of estados" [ngValue]="estado" [selected]="forma.value.estado.id === estado.id">{{estado.estadoPedido}}</option>
+                    </select>
+                </div>
+            </div>
+            <tr></tr>
+            <tr></tr>
+            <div class="row">
+                <div class="col-md-8 container">
+                    <table class="table">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>N°</th>
+
+                                <th>Producto</th>
+                                <th>Nombre Producto</th>
+                                <th>Valor</th>
+                                <th>Cantidad</th>
+                                <th>Subtotal</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+
+                        <tbody *ngFor="let producto of detallePedidosControls; let i = index" formArrayName="detallePedidos">
+                            <tr [formGroupName]="i">
+
+                                <td>{{i+1}}</td>
+
+                                <td>
+                                    <select class="form-control" name="productoSelect" formControlName="producto" (blur)="calcularTotal()">
+                                    <option value="">Seleccione un Producto</option>
+                                    <option *ngFor="let produ of productoslistado; let p = index"
+                                    [selected]="forma.value.detallePedidos[i].producto.id === produ.id" value="{{productoslistado[p].id}}" >{{produ.nombre}}</option>
+                                    </select>
+                                    <small *ngIf="getValidarProducto(i)" class="text-danger">Seleccione un Producto</small>
+                                </td>
+                                <td>
+                                    <!--
+                                    <select *ngIf="forma.value.detallePedidos[i].producto.id" class="form-control" name="productoSelect" formControlName="producto" (blur)="calcularTotal()">
+                                        <option value="" >Seleccione un Producto</option>
+                                        <option *ngFor="let produ of productoslistado"
+                                         [selected]="forma.value.detallePedidos[i].producto.id === produ.id" value="{{produ.id}}">{{produ.nombre}}</option>
+                                    </select>
+                                    <small *ngIf="getValidarProducto(i)" class="text-danger">Seleccione un Producto</small> -->
+                                    {{forma.value.detallePedidos[i].producto.nombre}}
+                                </td>
+                                <td>{{forma.value.detallePedidos[i].producto.precio}}</td>
+                                <td>
+                                    <input *ngIf="forma.value.detallePedidos[i].producto.id" type="text" class="form-control" formControlName="cantidad" [value]="forma.value.detallePedidos[i].cantidad" placeholder="Cantidad" (blur)="calcularTotal()" required>
+                                    <small *ngIf="getValidarCantidad(i)" class="text-danger">Ingrese un numero</small>
+                                </td>
+                                <td>{{tablaSubtotal(i)}}</td>
+                                <td><button class="btn btn-danger" *ngIf="forma.value.detallePedidos.length!=1" (blur)="calcularTotal()" (click)="borrarProducto(i)">Quitar</button></td>
+
+                            </tr>
+
+                        </tbody>
+                        <button class="btn btn-primary" type="button" (click)="addProducto()" (click)="calcularTotal()">Agregar Producto</button>
+                    </table>
+                    <pre>{{forma.valid}}</pre>
+                    <pre>{{forma.value | json}}</pre>
+                </div>
+                <div class="col-md-8 container">
+                    <span>Observaciones</span>
+                    <textarea class="form-control" id="w3review" name="observaciones" [value]="forma.value.observaciones" formControlName="observaciones" rows="4" cols="50"></textarea>
+                    <small *ngIf="observacionesNoValido" class="text-danger">Campo Requerido</small>
+                </div>
+                <div class="col-md-8 container">
+                    <span>Neto: </span>
+                    <span>{{neto}}</span>
+                    <th></th>
+                    <span>Iva: </span>
+                    <span>{{iva}}</span>
+                    <th></th>
+                    <span>Total: </span>
+                    <span>{{totalvalor}}</span>
+                    <th></th>
+                </div>
+                <div class="col-md-8 container">
+                    <button class="btn btn-primary" type="button" (click)="guardar()">Guardar Pedido</button>
+                </div>
+                <div class="col-md-8 container">
+                    <button class="btn btn-primary" type="button" (click)="volver()">Volver</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
