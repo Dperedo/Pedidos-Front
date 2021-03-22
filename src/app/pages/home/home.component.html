@@ -1,5 +1,40 @@
+<app-navbar></app-navbar>
+
 <div class="row">
-    <div class="col-md-5">
-        <p>Hola Mundo</p>
+    <div class="col-md-5 container">
+        <h1>Home</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 container">
+
+        <table class="table">
+            <thead class="thead-dark">
+                <tr>
+                    <th>N° Pedido</th>
+                    <th>Fecha Pedido</th>
+                    <th>Cliente</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody *ngIf="listado">
+                <tr>
+                    <td>123</td>
+                    <td>10/12/2019</td>
+                    <td>Diego Peredo</td>
+                    <td>$14000</td>
+                    <td>Pendiente</td>
+                    <td>
+                        <button class="btn btn-danger">Cerrar</button>
+                        <button class="btn btn-danger">Terminar</button>
+                    </td>
+                </tr>
+            </tbody>
+            <p *ngIf="!listado">No hay resgistros!</p>
+        </table>
+
     </div>
 </div>

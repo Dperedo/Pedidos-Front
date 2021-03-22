@@ -13,5 +13,10 @@
     {
       "path": "./tsconfig.spec.json"
     }
-]
+  ],
+  "configuracion": [
+    {
+      "url": "https://localhost:5001/api"
+    }
+  ]
 }
