@@ -1,15 +1,9 @@
 <app-navbar></app-navbar>
 
-<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-<!------ Include the above in your HEAD tag ---------->
-
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel='stylesheet' type='text/css'>
-
-
 <body>
     <div *ngIf="!formulario">
         <div class="row">
-            <div class="col-md-1.5 offset-md-4 mt-5 animated2 fadeInRight" id="head">
+            <div class="col-md-1.5 offset-md-5 mt-5 animated2 fadeInRight">
                 <h1>Lista Clientes</h1>
             </div>
         </div>
@@ -18,13 +12,13 @@
             <div class="col-md-2 offset-md-2 mt-5">
                 <input [(ngModel)]="buscar" name="buscar" (keyup.enter)="getBuscar()" type="text" class="form-control" placeholder="Buscar un dato">
                 <div class="mt-3">
-                    <button type="submit" (click)="getBuscar()">Buscar</button>
+                    <button class="btn btn-primary" (click)="getBuscar()">Buscar</button>
                 </div>
             </div>
 
 
             <div class="col-md-3 offset-md-4 mt-5">
-                <button class="btn btn-primary" type="submit" (click)="agregarCliente()">Agregar Cliente</button>
+                <button class="btn btn-primary" (click)="agregarCliente()">Agregar Cliente</button>
             </div>
         </div>
         <tr></tr>
@@ -35,36 +29,42 @@
 
                 <table class="table table-striped table-bordered">
 
-                    <thead id="formHead">
+                    <thead class="table-primary">
                         <tr>
 
                             <th><button class="btn"> <h6>Editar</h6> </button> </th>
                             <th>
-                                <button class="btn" *ngIf="orden!='RUTAcending'" (click)="ordenBy('RUTAcending')"><h6>RUT</h6></button>
-                                <button class="btn" *ngIf="orden=='RUTAcending'" (click)="ordenBy('RUTDescending')"><h6>RUT</h6></button>
-                                <mat-icon class="" *ngIf="orden=='RUTDescending'">keyboard_arrow_down</mat-icon>
-                                <mat-icon class="" *ngIf="orden=='RUTAcending'">keyboard_arrow_up</mat-icon>
+                                <button class="btn" *ngIf="orden!='RUTAcending'" (click)="ordenBy('RUTAcending')">
+                                    <h6>RUT <i class="bi bi-caret-down-fill" *ngIf="orden=='RUTDescending'"></i></h6>
+                                </button>
+                                <button class="btn" *ngIf="orden=='RUTAcending'" (click)="ordenBy('RUTDescending')">
+                                    <h6>RUT <i class="bi bi-caret-up-fill" *ngIf="orden=='RUTAcending'"></i></h6>
+                                </button>
+                            </th>
+                            <th>
+                                <button class="btn" *ngIf="orden!='RazonSocialAcending'" (click)="ordenBy('RazonSocialAcending')">
+                                    <h6>Nombre <i class="bi bi-caret-down-fill" *ngIf="orden=='RazonSocialDescending'"></i></h6>
+                                </button>
+                                <button class="btn" *ngIf="orden=='RazonSocialAcending'" (click)="ordenBy('RazonSocialDescending')">
+                                    <h6>Nombre <i class="bi bi-caret-up-fill" *ngIf="orden=='RazonSocialAcending'"></i></h6>
+                                </button>
+                            </th>
+                            <th>
+                                <button class="btn" *ngIf="orden!='FechaDeCreacionAcending'" (click)="ordenBy('FechaDeCreacionAcending')">
+                                    <h6>Fecha Creado <i class="bi bi-caret-down-fill" *ngIf="orden=='FechaDeCreacionDescending'"></i></h6>
+                                </button>
+                                <button class="btn" *ngIf="orden=='FechaDeCreacionAcending'" (click)="ordenBy('FechaDeCreacionDescending')">
+                                    <h6>Fecha Creado <i class="bi bi-caret-up-fill" *ngIf="orden=='FechaDeCreacionAcending'"></i></h6>
+                                </button>
 
                             </th>
                             <th>
-                                <button class="btn col-md-2" *ngIf="orden!='RazonSocialAcending'" (click)="ordenBy('RazonSocialAcending')"><h6>Nombre</h6></button>
-                                <button class="btn col-md-2" *ngIf="orden=='RazonSocialAcending'" (click)="ordenBy('RazonSocialDescending')"><h6>Nombre</h6></button>
-                                <mat-icon *ngIf="orden=='RazonSocialDescending'">keyboard_arrow_down</mat-icon>
-                                <mat-icon *ngIf="orden=='RazonSocialAcending'">keyboard_arrow_up</mat-icon>
-                            </th>
-                            <th>
-                                <button class="btn col-md-9" *ngIf="orden!='FechaDeCreacionAcending'" (click)="ordenBy('FechaDeCreacionAcending')"><h6>Fecha Creado <mat-icon *ngIf="orden=='FechaDeCreacionDescending'">keyboard_arrow_down</mat-icon></h6></button>
-                                <button class="btn col-md-9" *ngIf="orden=='FechaDeCreacionAcending'" (click)="ordenBy('FechaDeCreacionDescending')"><h6>Fecha Creado <mat-icon *ngIf="orden=='FechaDeCreacionAcending'">keyboard_arrow_up</mat-icon></h6></button>
-                                <!--
-                                <mat-icon *ngIf="orden=='FechaDeCreacionDescending'">keyboard_arrow_down</mat-icon>
-                                <mat-icon *ngIf="orden=='FechaDeCreacionAcending'">keyboard_arrow_up</mat-icon>
-                                -->
-                            </th>
-                            <th>
-                                <button class="btn" *ngIf="orden!='VigenteAcending'" (click)="ordenBy('VigenteAcending')"><h6>Vigente</h6></button>
-                                <button class="btn" *ngIf="orden=='VigenteAcending'" (click)="ordenBy('VigenteDescending')"><h6>Vigente</h6></button>
-                                <mat-icon *ngIf="orden=='VigenteDescending'">keyboard_arrow_down</mat-icon>
-                                <mat-icon *ngIf="orden=='VigenteAcending'">keyboard_arrow_up</mat-icon>
+                                <button class="btn" *ngIf="orden!='VigenteAcending'" (click)="ordenBy('VigenteAcending')">
+                                    <h6>Vigente <i class="bi bi-caret-down-fill" *ngIf="orden=='VigenteDescending'"></i></h6>
+                                </button>
+                                <button class="btn" *ngIf="orden=='VigenteAcending'" (click)="ordenBy('VigenteDescending')">
+                                    <h6>Vigente <i class="bi bi-caret-up-fill" *ngIf="orden=='VigenteAcending'"></i></h6>
+                                </button>
                             </th>
                             <th></th>
                         </tr>
@@ -72,15 +72,15 @@
                     <tbody>
                         <tr *ngFor="let listados of listado; let i = index">
                             <td>
-                                <button type="submit" (click)="editarCliente(listado[i].id)"><mat-icon>edit</mat-icon></button>
+                                <button class="btn btn-primary" type="submit" (click)="editarCliente(listado[i].id)"><mat-icon>edit</mat-icon></button>
                             </td>
                             <td data-title="'RUT'" sortable="'RUT'">{{listados.rut}}</td>
                             <td>{{listados.razonSocial}}</td>
                             <td>{{listados.fechaDeCreacion | date:'dd/MM/yyyy' }}</td>
                             <td>{{vigenteCliente(listados.vigente)}}</td>
                             <td>
-                                <button type="submit2" *ngIf="listados.vigente" (click)="editarVigente(listado[i].id,i)">Desactivar</button>
-                                <button type="submit" *ngIf="!listados.vigente" (click)="editarVigente(listado[i].id,i)">Activar</button>
+                                <button class="btn btn-danger" *ngIf="listados.vigente" (click)="editarVigente(listado[i].id,i)">Desactivar</button>
+                                <button class="btn btn-success" *ngIf="!listados.vigente" (click)="editarVigente(listado[i].id,i)">Activar</button>
                             </td>
                         </tr>
                         <p *ngIf="!total">No hay Clientes!</p>
@@ -121,23 +121,23 @@
 
     <div *ngIf="formulario">
         <div class="row">
-            <div class="col-md-3 offset-md-4 mt-5 animated2 fadeInDown">
+            <div class="col-md-4 offset-md-5 mt-5 animated2 fadeInDown">
                 <h1>Cliente</h1>
             </div>
         </div>
         <form autocomplete="off" [formGroup]="forma" (ngSubmit)="guardar()" class="container">
             <div class="col-md-7 offset-md-1 mt-5 animated2 fadeInUp">
                 <div class="form-group row">
-                    <label class="col-2 col-form-label">RazonSocial</label>
+                    <label class="col-2 col-form-label">Razon Social</label>
                     <div class="col-8">
-                        <input class="form-control" type="text" placeholder="razonSocial" formControlName="razonSocial" [class.is-invalid]="razonSocialNoValido">
+                        <input class="form-control" type="text" placeholder="Razon Social" formControlName="razonSocial" [class.is-invalid]="razonSocialNoValido">
                         <small *ngIf="razonSocialNoValido" class="text-danger">Ingrese RazonSocial</small>
                     </div>
                 </div>
                 <div class="form-group row">
                     <label class="col-2 col-form-label">RUT</label>
                     <div class="col-8">
-                        <input class="form-control" type="text" placeholder="rut" formControlName="rut" [class.is-invalid]="rutNoValido">
+                        <input class="form-control" type="text" placeholder="RUT" formControlName="rut" [class.is-invalid]="rutNoValido">
                         <small *ngIf="rutNoValido" class="text-danger">Ingrese RUT</small>
                     </div>
                 </div>
@@ -151,10 +151,10 @@
                 </div>
                 <div class="form-group row mt-5">
                     <div class="col-3">
-                        <button type="submit" (click)="guardar()">Guardar</button>
+                        <button type="submit" class="btn btn-success" (click)="guardar()">Guardar</button>
                     </div>
                     <div class="col-1">
-                        <button type="submit" (click)="volver()">Volver</button>
+                        <button type="submit" class="btn btn-primary" (click)="volver()">Volver</button>
                     </div>
                 </div>
 

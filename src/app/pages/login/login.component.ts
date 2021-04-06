@@ -31,10 +31,12 @@ export class LoginComponent implements OnInit {
       // this.guard.canActivate();
       this.router.navigateByUrl('/home');
     }
+    // this.ngOnInit();
   }
 
   ngOnInit() {
     if ( localStorage.getItem('username') ) {
+      console.log("hey");
       this.usuario.username =  localStorage.getItem('username');
       this.recordarme = true;
     }

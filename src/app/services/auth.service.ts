@@ -12,8 +12,8 @@ import configuracion from '../../../tsconfig.json';
 })
 export class AuthService {
 
-   private url = 'https://localhost:5001/api';
-  //private url = 'https://app-pedidos.azurewebsites.net/backapp/api';
+  private url = 'https://localhost:5001/api';
+  // private url = 'https://back-appwebsite.azurewebsites.net/api';
   // private url = configuracion['url'];
   // console.log(configuracion);
 
