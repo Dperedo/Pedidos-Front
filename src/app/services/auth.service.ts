@@ -36,6 +36,7 @@ export class AuthService {
     const headers = new HttpHeaders({
       Authorization: `Bearer ${ apikey }`
     });
+    console.log(this.url);
 
     return this.http.get(`${ this.url }/Usuarios/auth`, { headers });
   }

@@ -1,32 +1,37 @@
 <app-navbar></app-navbar>
 <div *ngIf="!formulario">
-    <div class="row">
-        <div class="col-md-3 offset-md-4 mt-5">
+    <div class="row text-center">
+        <div class="col-md-3 offset-md-5 mt-5">
             <h1>Lista Pedidos</h1>
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-3 container">
+    <div class="row mt-5">
+        <div class="col-md-2 offset-md-2 ">
+            <span>Buscar</span>
+            <input [(ngModel)]="buscar" name="buscar" (keyup.enter)="getBuscar()" type="text" class="form-control" placeholder="Buscar un dato">
+            <span>Estado</span>
+            <select class="form-control" name="estadoBuscar">
+                <option value="" disabled selected>Seleccione un Estado</option>
+                <option *ngFor="let estado of estados">{{estado.estadoPedido}}</option>
+            </select>
+
+        </div>
+        <div class="col-md-2 offset-md-1 ">
             <span>Fecha Pedido</span>
             <input [(ngModel)]="fechaMin" name="fecha" type="text" class="form-control" placeholder="Fecha Min.">
             <input [(ngModel)]="fechaMax" name="fecha" type="text" class="form-control" placeholder="Fecha Max.">
-
-            <span>buscar</span>
-            <input [(ngModel)]="buscar" name="buscar" (keyup.enter)="getBuscar()" type="text" class="form-control" placeholder="Buscar un dato">
-            <span>estado</span>
-            <select class="form-control" name="estadoBuscar">
-            <option value="" disabled selected>Seleccione un Estado</option>
-            <option *ngFor="let estado of estados">{{estado.estadoPedido}}</option>
-        </select>
-            <button class="btn btn-primary" type="submit" (click)="getBuscar()">Buscar</button>
         </div>
-        <div class="col-md-2 container">
-            <button class="btn btn-primary" (click)="agregarPedido()">Agregar Pedido</button>
-        </div>
-
     </div>
     <div class="row">
-        <div class="col-md-8 container">
+        <div class="col-md-2 offset-md-2 mt-2">
+            <button class="btn btn-primary" type="submit" (click)="getBuscar()">Buscar</button>
+        </div>
+        <div class="col-md-3 offset-md-3 mt-2 text-right">
+            <button class="btn btn-primary offset-md-7" (click)="agregarPedido()">Agregar Pedido <i class="bi bi-plus"></i></button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8 container mt-3" style="overflow-x:auto;">
 
             <table class="table table-striped table-bordered">
 
@@ -50,7 +55,7 @@
                         <td><button class="btn btn-primary" (click)="editarPedido(listados.id)">{{listados.secuencial}}</button></td>
                         <td>{{listados.fechaDeCreacion | date:'dd/MM/yyyy'}}</td>
                         <td>{{listados.cliente.razonSocial}}</td>
-                        <td>{{listados.total}}</td>
+                        <td>{{listados.total | currency:'':'symbol-narrow':'.0-0'}}</td>
                         <td>{{listados.estado.estadoPedido}}</td>
                         <td>
                             <button class="btn btn-primary">cerrar</button>
@@ -92,31 +97,29 @@
     <div>
         <form [formGroup]="forma" (ngSubmit)="guardar()">
             <div class="row">
-                <div class="col-md-5 container">
+                <div class="col-md-3 offset-md-5 mt-5">
                     <h1>Pedido</h1>
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-3 container">
-                    <span>Cliente</span>
-                    <select class="form-control" name="cliente" formControlName="cliente">
+                <div class="col-md-2 offset-md-2 mt-3">
+                    <span><h6>Cliente</h6></span>
+                    <select class="form-control mt-2" name="cliente" formControlName="cliente">
                     <option [ngValue]="null" disabled selected>Seleccione un Cliente</option>
                     <option *ngFor="let cliente of clientes" [selected]="forma.value.cliente.id === cliente.id" [ngValue]="cliente">{{cliente.razonSocial}}</option>
                     </select>
                     <small *ngIf="clienteNoValido" class="text-danger">Seleccione Cliente</small>
                 </div>
-                <div class="col-md-3 container" *ngIf="editar">
-                    <span>Estado</span>
-                    <select class="form-control" name="estado" formControlName="estado">
+                <div class="col-md-2 offset-md-4 mt-3" *ngIf="editar">
+                    <span><h6>Estado</h6></span>
+                    <select class="form-control mt-2" name="estado" formControlName="estado">
                     <option *ngFor="let estado of estados" [ngValue]="estado" [selected]="forma.value.estado.id === estado.id">{{estado.estadoPedido}}</option>
                     </select>
                 </div>
             </div>
-            <tr></tr>
-            <tr></tr>
             <div class="row">
-                <div class="col-md-8 container">
-                    <table class="table">
+                <div class="col-md-8 offset-md-2 mt-3" style="overflow-x:auto;">
+                    <table class="table table-striped">
                         <thead class="table-primary">
                             <tr>
                                 <th>N°</th>
@@ -137,9 +140,9 @@
 
                                 <td>
                                     <select class="form-control" name="productoSelect" formControlName="producto" (blur)="calcularTotal()">
-                                    <option value="">Seleccione un Producto</option>
-                                    <option *ngFor="let produ of productoslistado; let p = index"
-                                    [selected]="forma.value.detallePedidos[i].producto.id === produ.id" value="{{productoslistado[p].id}}" >{{produ.nombre}}</option>
+                                    <option [ngValue]="">Seleccione un Producto</option>
+                                    <option *ngFor="let produ of productoslistado; let p = index" [ngValue]="produ"
+                                    [selected]="forma.value.detallePedidos[i].producto.id === produ.id">{{produ.nombre}}</option>
                                     </select>
                                     <small *ngIf="getValidarProducto(i)" class="text-danger">Seleccione un Producto</small>
                                 </td>
@@ -153,45 +156,67 @@
                                     <small *ngIf="getValidarProducto(i)" class="text-danger">Seleccione un Producto</small> -->
                                     {{forma.value.detallePedidos[i].producto.nombre}}
                                 </td>
-                                <td>{{forma.value.detallePedidos[i].producto.precio}}</td>
+                                <td>{{forma.value.detallePedidos[i].producto.precio | currency:'':'':'.0-0'}}</td>
                                 <td>
                                     <input *ngIf="forma.value.detallePedidos[i].producto.id" type="text" class="form-control" formControlName="cantidad" [value]="forma.value.detallePedidos[i].cantidad" placeholder="Cantidad" (blur)="calcularTotal()" required>
                                     <small *ngIf="getValidarCantidad(i)" class="text-danger">Ingrese un numero</small>
                                 </td>
-                                <td>{{tablaSubtotal(i)}}</td>
+                                <td>{{tablaSubtotal(i) | currency:'':'symbol-narrow':'.0-0'}}</td>
                                 <td><button class="btn btn-danger" *ngIf="forma.value.detallePedidos.length!=1" (blur)="calcularTotal()" (click)="borrarProducto(i)">Quitar</button></td>
 
                             </tr>
 
                         </tbody>
-                        <button class="btn btn-primary" type="button" (click)="addProducto()" (click)="calcularTotal()">Agregar Producto</button>
                     </table>
+                    <!--
                     <pre>{{forma.valid}}</pre>
                     <pre>{{forma.value | json}}</pre>
+                    -->
                 </div>
-                <div class="col-md-8 container">
-                    <span>Observaciones</span>
-                    <textarea class="form-control" id="w3review" name="observaciones" [value]="forma.value.observaciones" formControlName="observaciones" rows="4" cols="50"></textarea>
-                    <small *ngIf="observacionesNoValido" class="text-danger">Campo Requerido</small>
+            </div>
+            <div class="row">
+                <div class="col-md-2 offset-md-2 mt-3">
+                    <button class="btn btn-primary" type="button" (click)="addProducto()" (click)="calcularTotal()">Agregar Producto</button>
                 </div>
-                <div class="col-md-8 container">
-                    <span>Neto: </span>
-                    <span>{{neto}}</span>
-                    <th></th>
-                    <span>Iva: </span>
-                    <span>{{iva}}</span>
-                    <th></th>
-                    <span>Total: </span>
-                    <span>{{totalvalor}}</span>
-                    <th></th>
+                <div class="col-md-2 offset-md-4 mt-3">
+                    <table class="table-striped table-bordered">
+
+                        <tr>
+                            <td class="col-md-1 text-center">
+                                <h6>Neto</h6>
+                            </td>
+                            <td class="col-md-1 text-center">{{neto | currency:'':'symbol-narrow':'.0-0'}}</td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-1 text-center">
+                                <h6>Iva</h6>
+                            </td>
+                            <td class="col-md-1 text-center">{{iva | currency:'':'symbol-narrow':'.0-0'}}</td>
+                        </tr>
+                        <tr>
+                            <td class="col-md-1 text-center">
+                                <h6>
+                                    Total
+                                </h6>
+                            </td>
+                            <td class="col-md-1 text-center">{{totalvalor | currency:'':'symbol-narrow':'.0-0' }}</td>
+                        </tr>
+
+                    </table>
                 </div>
-                <div class="col-md-8 container">
-                    <button class="btn btn-primary" type="button" (click)="guardar()">Guardar Pedido</button>
+            </div>
+            <div class="col-md-4 offset-md-2">
+                <span><h6>Observaciones</h6></span>
+                <textarea class="form-control mt-2" id="w3review" name="observaciones" [value]="forma.value.observaciones" formControlName="observaciones" rows="4" cols="40"></textarea>
+                <small *ngIf="observacionesNoValido" class="text-danger">Campo Requerido</small>
+            </div>
+            <div class="row">
+                <div class="col-md-2 offset-md-2 mt-4">
+                    <button class="btn btn-success" type="button" (click)="guardar()">Guardar Pedido</button>
                 </div>
-                <div class="col-md-8 container">
+                <div class="col-md-1 offset-md-1 mt-4">
                     <button class="btn btn-primary" type="button" (click)="volver()">Volver</button>
                 </div>
-
             </div>
         </form>
     </div>

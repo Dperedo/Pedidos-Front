@@ -29,7 +29,7 @@ export class LoginComponent implements OnInit {
     if ( localStorage.getItem('token') && this.guard.canActivate() ) {
       console.log('hola2');
       // this.guard.canActivate();
-      this.router.navigateByUrl('/home');
+      this.router.navigateByUrl('/pedido');
     }
     // this.ngOnInit();
   }
@@ -60,7 +60,7 @@ export class LoginComponent implements OnInit {
       if ( this.recordarme ) {
         localStorage.setItem('username', this.usuario.username);
       }
-      this.router.navigateByUrl('/home');
+      this.router.navigateByUrl('/pedido');
       console.log(resp);
     }, (err) => {
       Swal.close();

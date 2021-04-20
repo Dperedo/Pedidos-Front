@@ -430,9 +430,8 @@ export class PedidoComponent implements OnInit {
           console.log(resp);
           this.listadoPedido();
         });
-        this.formulario = false;
-        this.editar = false;
-        this.forma.reset();
+        this.volver();
+        console.log("guardar actualizar");
       } else {
         console.log('Nuevo Pedido');
         this.pedido.estado = this.estados[0];

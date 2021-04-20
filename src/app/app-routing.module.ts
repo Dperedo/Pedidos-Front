@@ -15,7 +15,7 @@ const routes: Routes = [
   { path: 'producto' , component: ProductoComponent, canActivate: [ AuthGuard ] },
   { path: 'producto/:pag' , component: ProductoComponent, canActivate: [ AuthGuard ] },
   { path: 'producto/:buscar/:pag' , component: ProductoComponent, canActivate: [ AuthGuard ] },
-  { path: 'pedido' , component: PedidoComponent },
+  { path: 'pedido' , component: PedidoComponent, canActivate: [ AuthGuard ]},
   { path: 'pedido/:pag' , component: PedidoComponent },
   { path: 'pedido/:buscar/:pag' , component: PedidoComponent },
   { path: 'login' , component: LoginComponent },
