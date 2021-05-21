@@ -307,10 +307,10 @@ export class PedidoComponent implements OnInit {
 
   valorNeto() {
     this.neto = 0;
-    console.log('hola: ' + this.subtotal);
+    console.log('subtotal: ' + this.subtotal);
     this.subtotal.forEach( valor => {
       this.neto = this.neto + valor;
-      console.log('wow ' + this.neto);
+      console.log('neto ' + this.neto);
     });
     return this.neto;
   }

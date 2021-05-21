@@ -96,7 +96,7 @@
 <div *ngIf="formulario">
     <div>
         <form [formGroup]="forma" (ngSubmit)="guardar()">
-            <div class="row">
+            <div class="row text-center">
                 <div class="col-md-3 offset-md-5 mt-5">
                     <h1>Pedido</h1>
                 </div>
@@ -117,8 +117,8 @@
                     </select>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-8 offset-md-2 mt-3" style="overflow-x:auto;">
+            <div class="row" style="overflow-x:auto;">
+                <div class="col-md-8 offset-md-2 mt-3">
                     <table class="table table-striped">
                         <thead class="table-primary">
                             <tr>
@@ -174,38 +174,38 @@
                     -->
                 </div>
             </div>
-            <div class="row">
+            <div class="row text-center">
                 <div class="col-md-2 offset-md-2 mt-3">
                     <button class="btn btn-primary" type="button" (click)="addProducto()" (click)="calcularTotal()">Agregar Producto</button>
                 </div>
-                <div class="col-md-2 offset-md-4 mt-3">
+                <div class="col-md-4 offset-md-4 mt-3 text-center">
                     <table class="table-striped table-bordered">
 
                         <tr>
-                            <td class="col-md-1 text-center">
+                            <td>
                                 <h6>Neto</h6>
                             </td>
-                            <td class="col-md-1 text-center">{{neto | currency:'':'symbol-narrow':'.0-0'}}</td>
+                            <td>{{neto | currency:'':'symbol-narrow':'.0-0'}}</td>
                         </tr>
                         <tr>
-                            <td class="col-md-1 text-center">
+                            <td>
                                 <h6>Iva</h6>
                             </td>
-                            <td class="col-md-1 text-center">{{iva | currency:'':'symbol-narrow':'.0-0'}}</td>
+                            <td>{{iva | currency:'':'symbol-narrow':'.0-0'}}</td>
                         </tr>
                         <tr>
-                            <td class="col-md-1 text-center">
+                            <td>
                                 <h6>
                                     Total
                                 </h6>
                             </td>
-                            <td class="col-md-1 text-center">{{totalvalor | currency:'':'symbol-narrow':'.0-0' }}</td>
+                            <td>{{totalvalor | currency:'':'symbol-narrow':'.0-0' }}</td>
                         </tr>
 
                     </table>
                 </div>
             </div>
-            <div class="col-md-4 offset-md-2">
+            <div class="col-md-4 offset-md-2 mt-3">
                 <span><h6>Observaciones</h6></span>
                 <textarea class="form-control mt-2" id="w3review" name="observaciones" [value]="forma.value.observaciones" formControlName="observaciones" rows="4" cols="40"></textarea>
                 <small *ngIf="observacionesNoValido" class="text-danger">Campo Requerido</small>
